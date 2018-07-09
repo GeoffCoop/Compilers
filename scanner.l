@@ -5,7 +5,7 @@
 	#include <iostream>
 using namespace std;
 
-	#include "parser.tab.h"
+	#include "parser.hpp"
 	int lineNum = 1;
 %}
 
