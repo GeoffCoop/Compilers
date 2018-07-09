@@ -1,0 +1,10 @@
+*.c
+*.h
+output
+CMakeF*
+CMakeC*
+*.cmake
+Makefile
+cpsl
+*.cpp
+*.hpp

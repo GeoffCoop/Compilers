@@ -3,6 +3,8 @@
 #include<fstream>
 
 extern int yylex();
+extern int yyparse();
+extern int lineNum;
 void yyerror(const char*);
 %}
 
@@ -78,7 +80,7 @@ void yyerror(const char*);
 %left AND_SYMBOL OR_SYMBOL
 %right NOT_SYMBOL
 %nonassoc EQUAL_SYMBOL NOTEQUAL_SYMBOL LT_SYMBOL LTE_SYMBOL GT_SYMBOL GTE_SYMBOL
-%left PLUS_SYMBOL MINUS_SYMBOL MULT_SYMBOL DIV_SYMBOL MOD_SYMBOL
+%left PLUS_SYMBOL MINUS_SYMBOL MULT_SYMBOL DIV_SYMBOL MODULO_SYMBOL
 %right UNARYMINUS_SYMBOL
 
 %type <char_val> CHRCONST_SYMBOL
@@ -185,7 +187,7 @@ VarDecls: VarDecl
 VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
 	;
 
-StatementSequence: Statement
+StatementSequence: Statement {}
 	| StatementSequence SCOLON_SYMBOL Statement
 	;
 
@@ -202,7 +204,7 @@ Statement: Assignment
 	|
 	;
 
-Assignment: LValue ASSIGN_SYMBOL Expression
+Assignment: LValue ASSIGN_SYMBOL Expression {}
 	;
 
 IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL
@@ -214,7 +216,7 @@ ElseIf: ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf
 	;
 
 OptElse: 
-	| ELSE_SYMBOL StatementSequence 
+	| ELSE_SYMBOL StatementSequence {}
 	;
 
 WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL
@@ -223,7 +225,7 @@ WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL
 RepeatStatement: REPEAT_SYMBOL StatementSequence UNTIL_SYMBOL Expression
 	;
 
-ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL
+ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL {}
 	;
 
 ToDownTo: TO_SYMBOL
@@ -270,7 +272,7 @@ Expression: Expression OR_SYMBOL Expression
 	| Expression MINUS_SYMBOL Expression
 	| Expression MULT_SYMBOL Expression
 	| Expression DIV_SYMBOL Expression
-	| Expression MOD_SYMBOL Expression
+	| Expression MODULO_SYMBOL Expression
 	| NOT_SYMBOL Expression
 	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL
 	| LPAREN_SYMBOL Expression RPAREN_SYMBOL
@@ -292,9 +294,13 @@ LValue: IDENT_SYMBOL
 
 %%
 
+int main(int, char**) {
+	yyparse();
+}
+
 void yyerror(const char* msg)
 {
-	std::cerr<<msg;
+	std::cerr<< lineNum <<msg << std::endl;
 }
 
 
