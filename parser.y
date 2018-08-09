@@ -260,31 +260,31 @@ OptExpressions:
 	| Expressions
 	;
 
-Expression: Expression OR_SYMBOL Expression
-	| Expression AND_SYMBOL Expression
-	| Expression EQUAL_SYMBOL Expression
-	| Expression NOTEQUAL_SYMBOL Expression
-	| Expression LTE_SYMBOL Expression
-	| Expression GTE_SYMBOL Expression
-	| Expression LT_SYMBOL Expression
-	| Expression GT_SYMBOL Expression
-	| Expression PLUS_SYMBOL Expression
-	| Expression MINUS_SYMBOL Expression
-	| Expression MULT_SYMBOL Expression
-	| Expression DIV_SYMBOL Expression
-	| Expression MODULO_SYMBOL Expression
-	| NOT_SYMBOL Expression
-	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL
-	| LPAREN_SYMBOL Expression RPAREN_SYMBOL
-	| IDENT_SYMBOL LPAREN_SYMBOL OptExpressions RPAREN_SYMBOL
-	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL
-	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL
-	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL
-	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL
-	| LValue
-	| CHRCONST_SYMBOL
-	| INT_SYMBOL
-	| STRING_SYMBOL
+Expression: Expression OR_SYMBOL Expression	{}
+	| Expression AND_SYMBOL Expression	{}
+	| Expression EQUAL_SYMBOL Expression	{}
+	| Expression NOTEQUAL_SYMBOL Expression	{}
+	| Expression LTE_SYMBOL Expression	{}	
+	| Expression GTE_SYMBOL Expression	{}
+	| Expression LT_SYMBOL Expression	{}
+	| Expression GT_SYMBOL Expression	{}
+	| Expression PLUS_SYMBOL Expression	{}
+	| Expression MINUS_SYMBOL Expression	{}
+	| Expression MULT_SYMBOL Expression	{}
+	| Expression DIV_SYMBOL Expression	{}
+	| Expression MODULO_SYMBOL Expression	{}
+	| NOT_SYMBOL Expression			{}
+	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL		{}
+	| LPAREN_SYMBOL Expression RPAREN_SYMBOL{}
+	| IDENT_SYMBOL LPAREN_SYMBOL OptExpressions RPAREN_SYMBOL	{}
+	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
+	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
+	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
+	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
+	| LValue				{}
+	| CHRCONST_SYMBOL			{}
+	| INT_SYMBOL				{}
+	| STRING_SYMBOL				{}
 	;
 
 LValue: IDENT_SYMBOL
