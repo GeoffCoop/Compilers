@@ -1,6 +1,7 @@
 %{
 #include<iostream>
 #include<fstream>
+#include"FrontEnd.hpp"
 
 extern int yylex();
 extern int yyparse();
@@ -260,31 +261,31 @@ OptExpressions:
 	| Expressions
 	;
 
-Expression: Expression OR_SYMBOL Expression	{}
-	| Expression AND_SYMBOL Expression	{}
-	| Expression EQUAL_SYMBOL Expression	{}
-	| Expression NOTEQUAL_SYMBOL Expression	{}
-	| Expression LTE_SYMBOL Expression	{}	
-	| Expression GTE_SYMBOL Expression	{}
-	| Expression LT_SYMBOL Expression	{}
-	| Expression GT_SYMBOL Expression	{}
-	| Expression PLUS_SYMBOL Expression	{}
-	| Expression MINUS_SYMBOL Expression	{}
-	| Expression MULT_SYMBOL Expression	{}
-	| Expression DIV_SYMBOL Expression	{}
-	| Expression MODULO_SYMBOL Expression	{}
-	| NOT_SYMBOL Expression			{}
-	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL		{}
-	| LPAREN_SYMBOL Expression RPAREN_SYMBOL{}
-	| IDENT_SYMBOL LPAREN_SYMBOL OptExpressions RPAREN_SYMBOL	{}
-	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
-	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
-	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
-	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{}
-	| LValue				{}
-	| CHRCONST_SYMBOL			{}
-	| INT_SYMBOL				{}
-	| STRING_SYMBOL				{}
+Expression: Expression OR_SYMBOL Expression	{$$ = FE::OrExpr($1,$3); }
+	| Expression AND_SYMBOL Expression	{ $$ = FE::AndExpr($1,$3); }
+	| Expression EQUAL_SYMBOL Expression	{ $$ = FE::EQExpr($1,$3);}
+	| Expression NOTEQUAL_SYMBOL Expression	{ $$ = FE::NEExpr($1,$3); }
+	| Expression LTE_SYMBOL Expression	{ $$ = FE::LTEExpr($1, $3); }	
+	| Expression GTE_SYMBOL Expression	{ $$ = FE::GTEExpr($1,$3); }
+	| Expression LT_SYMBOL Expression	{ $$ = FE::LTExpr($1, $3); }
+	| Expression PLUS_SYMBOL Expression 	{ $$ = FE::PlusExpr($1, $3); }
+	| Expression GT_SYMBOL Expression	{ $$ = FE::GTExpr($1,$3); }
+	| Expression MINUS_SYMBOL Expression	{ $$ = FE::MinExpr($1,$3); }
+	| Expression MULT_SYMBOL Expression	{ $$ = FE::MultExpr($1,$3); } 
+	| Expression DIV_SYMBOL Expression	{ $$ = FE::DivExpr($1,$3); }
+	| Expression MODULO_SYMBOL Expression	{ $$ = FE::ModExpr($1,$3); }
+	| NOT_SYMBOL Expression			{ $$ = FE::NotExpr($2); }
+	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL		{ $$ = FE::UMinusExpr($2); }
+	| LPAREN_SYMBOL Expression RPAREN_SYMBOL{ $$ = $2; }
+	| IDENT_SYMBOL LPAREN_SYMBOL OptExpressions RPAREN_SYMBOL	{ $$ = FE::CallFunction($1, $3); }
+	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::ChrExpr($3); }
+	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::OrdExpr($3); }
+	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = FE::PredExpr($3); }
+	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = FE::SuccExpr($3); }
+	| LValue				{/* not sure what to do here */}
+	| CHRCONST_SYMBOL			{ $$ = FE::CharExpr($1); }
+	| INT_SYMBOL				{ $$ = FE::IntExpr($1); }
+	| STRING_SYMBOL				{ $$ = FE::StringExpr($1); delete($1); }
 	;
 
 LValue: IDENT_SYMBOL
