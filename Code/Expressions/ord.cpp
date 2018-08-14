@@ -1,0 +1,9 @@
+#ifndef
+#define
+
+class
+{
+}
+
+
+#endif

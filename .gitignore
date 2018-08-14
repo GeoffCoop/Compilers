@@ -6,6 +6,8 @@ CMakeC*
 *.cmake
 Makefile
 cpsl
-*.cpp
-*.hpp
 *.swp
+scanner.cpp
+scanner.hpp
+parser.cpp
+parser.hpp
