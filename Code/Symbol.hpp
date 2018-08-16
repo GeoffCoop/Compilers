@@ -8,8 +8,8 @@ class Symbol{
 public:
 
 	Symbol(std::string& id, std::shared_ptr<Type> const& type, int memoryLocation):
-		id(id),
-		type (type),
+		id(id), 		//lexeme
+		type (type),	//type
 		m_memoryLocation(memoryLocation)
 		{}
 private:

@@ -6,6 +6,7 @@
 
 class NE : public Expression
 {
+public:
 	NE(std::shared_ptr<Expression>, std::shared_ptr<Expression>);
 
 private:

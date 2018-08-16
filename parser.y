@@ -257,8 +257,8 @@ WriteArgs: WriteArgs COMMA_SYMBOL Expression
 	| Expression
 	;
 
-Arguments: Arguments COMMA_SYMBOL Expression 	{$$ = FE::dummy($1,$3);}
-	| Expression				{$$ = FE::dummy($1);}
+Arguments: Arguments COMMA_SYMBOL Expression 	{}
+	| Expression				{}
 	;
 
 ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL
@@ -291,7 +291,7 @@ Expression: Expression OR_SYMBOL Expression	{$$=FE::OrExpr($1,$3);}
 	| LValue				{/* not sure what to do here */}
 	| CHRCONST_SYMBOL			{ $$ = FE::CharExpr($1); }
 	| INT_SYMBOL				{ $$ = FE::IntExpr($1); }
-	| STRING_SYMBOL				{ $$ = FE::StringExpr($1); delete($1); }
+	| STRING_SYMBOL				{ $$ = FE::StringExpr($1); }
 	;
 
 LValue: IDENT_SYMBOL
