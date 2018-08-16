@@ -1,7 +1,9 @@
-#ifndef
-#define
+#ifndef PRED_HPP
+#define PRED_HPP
 
-class
+#include "Expression.hpp"
+
+class Pred : public Expression
 {
 }
 

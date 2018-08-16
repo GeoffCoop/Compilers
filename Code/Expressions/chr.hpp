@@ -1,7 +1,9 @@
-#ifndef
-#define
+#ifndef CHR_HPP
+#define CHR_HPP
 
-class
+#include "Expression.hpp"
+
+class Chr : public Expression
 {
 }
 

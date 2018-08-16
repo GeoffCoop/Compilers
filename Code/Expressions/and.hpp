@@ -1,6 +1,8 @@
 #ifndef AND_HPP
 #define AND_HPP
 
+#include "Expression.hpp"
+
 class And : public Expression
 {
 	And(std::shared_ptr<Expression>, std::shared_ptr<Expression>);

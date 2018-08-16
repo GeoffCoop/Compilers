@@ -1,7 +1,9 @@
-#ifndef
-#define
+#ifndef UMIN_HPP
+#define UMIN_HPP
 
-class
+#include "Expression.hpp"
+
+class UMin : public Expression
 {
 }
 

@@ -1,6 +1,9 @@
 #ifndef MULT_HPP
 #define MULT_HPP
 
+#include "Expression.hpp"
+#include <memory>
+
 class Mult : public Expression
 {
 	Mult(std::shared_ptr<Expression>, std::shared_ptr<Expression>);

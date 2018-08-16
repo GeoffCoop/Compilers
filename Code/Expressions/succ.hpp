@@ -1,7 +1,9 @@
-#ifndef
-#define
+#ifndef SUCC_HPP
+#define SUCC_HPP
 
-class
+#include "Expression.hpp"
+
+class Succ : public Expression
 {
 }
 

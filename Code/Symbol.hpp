@@ -6,12 +6,16 @@
 
 class Symbol{
 public:
+
+	Symbol(std::string& id, std::shared_ptr<Type> const& type, int memoryLocation):
+		id(id),
+		type (type),
+		m_memoryLocation(memoryLocation)
+		{}
+private:
 	std::string id;
 	std::shared_ptr<Type> type;
-	
-	Symbol(std::string& id, std::shared_ptr<Type> const& type):
-		id(id),
-		type (type)
+	int m_memoryLocation
 
 }
 

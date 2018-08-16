@@ -1,9 +1,0 @@
-#ifndef
-#define
-
-class
-{
-}
-
-
-#endif

@@ -1,7 +1,10 @@
 #ifndef LVALUEEXPR_HPP
 #define LVALUEEXPR_HPP
 
-class lValueExpr
+#include "Expression.hpp"
+#include <memory>
+
+class lValueExpr : public Expression
 {
 	lValueExpr();
 

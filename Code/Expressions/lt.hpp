@@ -1,6 +1,9 @@
 #ifndef LT_HPP
 #define LT_HPP
 
+#include "Expression.hpp"
+#include <memory>
+
 class Lt : public Expression
 {
 	Lt(std::shared_ptr<Expression>, std::shared_ptr<Expression>);

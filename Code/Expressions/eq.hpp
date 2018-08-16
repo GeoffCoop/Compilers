@@ -1,6 +1,9 @@
 #ifndef EQ_HPP
 #define EQ_HPP
 
+#include "Expression.hpp"
+#include <memory>
+
 class EQ : public Expression
 {
 	EQ(std::shared_ptr<Expression>, std::shared_ptr<Expression>);

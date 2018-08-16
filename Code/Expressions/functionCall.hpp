@@ -1,7 +1,10 @@
-#ifndef
-#define
+#ifndef FUNCTIONCALL_HPP
+#define FUNCTIONCALL_HPP
 
-class
+#include "Expression.hpp"
+#include <memory>
+
+class FunctionCall : public Expression
 {
 }
 

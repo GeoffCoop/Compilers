@@ -1,7 +1,9 @@
-#ifndef
-#define
+#ifndef NOT_HPP
+#define NOT_HPP
 
-class
+#include "Expression.hpp"
+
+class Not : public Expression
 {
 }
 

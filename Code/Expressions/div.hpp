@@ -1,6 +1,9 @@
 #ifndef DIV_HPP
 #define DIV_HPP
 
+#include "Expression.hpp"
+#include <memory>
+
 class Div : public Expression
 {
 

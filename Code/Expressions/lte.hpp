@@ -1,6 +1,9 @@
 #ifndef LTE_HPP
 #define LTE_HPP 
 
+#include "Expression.hpp"
+#include <memory>
+
 class Lte : public Expression
 {
 	Lte(std::shared_ptr<Expression>, std::shared_ptr<Expression>);

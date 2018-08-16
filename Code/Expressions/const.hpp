@@ -1,7 +1,9 @@
-#ifndef
-#define
+#ifndef CONST_HPP
+#define CONST_HPP
 
-class
+#include "Expression.hpp"
+
+class ConstExpr : public Expression
 {
 }
 
