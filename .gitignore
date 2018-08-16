@@ -11,3 +11,4 @@ scanner.cpp
 scanner.hpp
 parser.cpp
 parser.hpp
+.vs*
