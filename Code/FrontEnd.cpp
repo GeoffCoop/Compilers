@@ -2,7 +2,13 @@
 
 #include <memory>
 #include <vector>
+
+#include "SymbolTable.hpp"
+#include "Symbol.hpp"
 #include "Expressions/Expression.hpp"
+#include "LValue.hpp"
+
+
 #include "Expressions/stringExpression.hpp"
 #include "Expressions/intExpression.hpp"
 #include "Expressions/charExpression.hpp"
@@ -53,14 +59,29 @@ class FrontEnd
         if (fe) { return fe; }
         else { fe = std::make_shared<FrontEnd>(); }
     }
+
+    void push_ST(){
+        symbolTable = std::make_shared<SymbolTable>(symbolTable);
+    }
+    void pop_ST(){
+        symbolTable = symbolTable->getParent();
+    }
+
+    std::shared_ptr<SymbolTable> getSymbolTable()   {
+        return symbolTable;
+    }
+
     //some list of expressions
     NodeList<Expression> expressions;
+    NodeList<LValue> lValues;
     
     private:
     static std::shared_ptr<FrontEnd> fe;
+    std::shared_ptr<SymbolTable> symbolTable;
 };
 
 
+#pragma region Expressions
 int FE::StringExpr(char* x){
     auto fe = FrontEnd::instance();
     return fe->expressions.add(std::make_shared<StringExpression>(x));
@@ -184,12 +205,35 @@ int FE::OrExpr(int x, int y){
     auto b = fe->expressions.get(y);
     return fe->expressions.add(std::make_shared<Or>(a,b));
 }
+int FE::LValueExpr(int x){
+    auto fe = FrontEnd::instance();
+    auto lval = fe->lValues.get(x);
+    return fe->expressions.add(std::make_shared<LValueExpression>(lval));
+}
 
 int FE::CallFunction(char* x, int y){
     auto fe = FrontEnd::instance();
 
 }
 
+#pragma endregion
 
+#pragma region LValues
+int FE::LValID(char* id){
+    auto fe = FrontEnd::instance();
+    return fe->lValues.add(std::make_shared<IDLValue>(id));
+}
+int FE::LValMemberAccess(int base, char* ident){
+    auto fe = FrontEnd::instance();
+    auto lval = fe->lValues.get(base);
+    return fe->lValues.add(std::make_shared<MemberLValue>(lval, ident));
+}
+int FE::LValArrayAccess(int base, int access){
+    auto fe = FrontEnd::instance();
+    auto lval = fe->lValues.get(base);
+    auto expr = fe->expressions.get(access);
+    return fe->lValues.add(std::make_shared<ArrayAccesLValue>(lval, expr));
+}
+#pragma endregion
 
 

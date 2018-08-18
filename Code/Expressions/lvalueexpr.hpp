@@ -2,14 +2,19 @@
 #define LVALUEEXPR_HPP
 
 #include "Expression.hpp"
+#include "../LValue.hpp"
 #include <memory>
 
-class lValueExpr : public Expression
+class LValue;
+
+class LValueExpression : public Expression
 {
-	lValueExpr();
+	public:
+	LValueExpression(std::shared_ptr<LValue> l) : lValue(l){}
 
 
-
+	private:
+	std::shared_ptr<LValue> lValue;
 
 }
 

@@ -17,6 +17,6 @@ private:
 	std::shared_ptr<SymbolTable> m_parent;
 	std::map<std::string, std::shared_ptr<Symbol>> m_symbols;
 
-}
+};
 
 #endif

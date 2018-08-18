@@ -288,15 +288,15 @@ Expression: Expression OR_SYMBOL Expression	{$$=FE::OrExpr($1,$3);}
 	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::OrdExpr($3); }
 	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = FE::PredExpr($3); }
 	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = FE::SuccExpr($3); }
-	| LValue				{/* not sure what to do here */}
+	| LValue					{ $$ = FE::LValExpr($1); }
 	| CHRCONST_SYMBOL			{ $$ = FE::CharExpr($1); }
 	| INT_SYMBOL				{ $$ = FE::IntExpr($1); }
 	| STRING_SYMBOL				{ $$ = FE::StringExpr($1); }
 	;
 
-LValue: IDENT_SYMBOL
-	| LValue DOT_SYMBOL IDENT_SYMBOL
-	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL
+LValue: IDENT_SYMBOL										{ $$ = FE::LValID($1); }
+	| LValue DOT_SYMBOL IDENT_SYMBOL						{ $$ = FE::LValMemberAccess($1, $3); }
+	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = FE::LValArrayAccess($1, $3);}
 	;
 
 %%

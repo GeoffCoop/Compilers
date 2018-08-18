@@ -12,7 +12,7 @@ public:
 private:
 	std::shared_ptr<Expression> m_right;
 	std::shared_ptr<Expression> m_left;
-}
+};
 
 
 #endif

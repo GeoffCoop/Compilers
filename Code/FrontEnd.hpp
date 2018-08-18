@@ -27,7 +27,10 @@ namespace FE
 	int EQExpr(int x, int y);
 	int AndExpr(int x, int y);
 	int OrExpr(int x, int y);
-	int dummy (int, int);
-	int dummy (int);
-}
+	int LValueExpr(int x);
+
+	int LValID(char*);
+	int LValMemberAccess(int, char*);
+	int LValArrayAccess(int, int);
+};
 #endif

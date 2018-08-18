@@ -15,8 +15,8 @@ public:
 private:
 	std::string id;
 	std::shared_ptr<Type> type;
-	int m_memoryLocation
+	int m_memoryLocation;
 
-}
+};
 
 #endif
