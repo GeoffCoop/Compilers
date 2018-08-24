@@ -93,6 +93,7 @@ void yyerror(const char*);
 %type <int_val> Expression
 %type <int_val> OptArguments
 %type <int_val> Arguments
+%type <int_val> LValue
 
 %%
 Program: ProgramHead Block DOT_SYMBOL{}
