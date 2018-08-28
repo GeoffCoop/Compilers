@@ -196,23 +196,23 @@ StatementSequence: Statement {}
 	| StatementSequence SCOLON_SYMBOL Statement
 	;
 
-Statement: Assignment
-	| IfStatement
-	| WhileStatement
-	| RepeatStatement
-	| ForStatement
-	| StopStatement
-	| ReturnStatement
-	| ReadStatement
-	| WriteStatement
-	| ProcedureCall
-	|
+Statement: Assignment		{}
+	| IfStatement			{}
+	| WhileStatement		{}
+	| RepeatStatement		{}
+	| ForStatement			{}
+	| StopStatement			{}
+	| ReturnStatement		{}
+	| ReadStatement			{}
+	| WriteStatement		{}
+	| ProcedureCall			{}
+	|						{}
 	;
 
 Assignment: LValue ASSIGN_SYMBOL Expression {}
 	;
 
-IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL
+IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{}
 	;
 
 
@@ -240,29 +240,29 @@ ToDownTo: TO_SYMBOL
 StopStatement: STOP_SYMBOL
 	;
 
-ReturnStatement: RETURN_SYMBOL
+ReturnStatement: RETURN_SYMBOL	{}
 	| RETURN_SYMBOL Expression
 	;
 
-ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL
+ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL	{}
 	;
 
-LValues: LValues COMMA_SYMBOL LValue
-	| LValue
+LValues: LValues COMMA_SYMBOL LValue	{}
+	| LValue							{}
 	;
 
-WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL
+WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStatement($3); }
 	;
 
-WriteArgs: WriteArgs COMMA_SYMBOL Expression
-	| Expression
+WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ $$ = FE::StackArgument($1, $3); }
+	| Expression								{ $$ = FE::NewArgument($1); }
 	;
 
-Arguments: Arguments COMMA_SYMBOL Expression 	{}
-	| Expression				{}
+Arguments: Arguments COMMA_SYMBOL Expression 	{ $$ = FE::StackArgument($1, $3); }
+	| Expression								{ $$ = FE::NewArgument($1); }
 	;
 
-ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL
+ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = FE::ProcCall($3); }
 	;
 
 OptArguments: 	{$$ = -1;}
@@ -283,7 +283,7 @@ Expression: Expression OR_SYMBOL Expression	{$$=FE::OrExpr($1,$3);}
 	| Expression MODULO_SYMBOL Expression	{ $$ = FE::ModExpr($1,$3); }
 	| NOT_SYMBOL Expression			{ $$ = FE::NotExpr($2); }
 	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL		{ $$ = FE::UMinusExpr($2); }
-	| LPAREN_SYMBOL Expression RPAREN_SYMBOL{ $$ = $2; }
+	| LPAREN_SYMBOL Expression RPAREN_SYMBOL { $$ = $2; }
 	| IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = FE::CallFunction($1, $3); }
 	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::ChrExpr($3); }
 	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::OrdExpr($3); }

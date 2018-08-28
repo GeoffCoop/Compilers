@@ -1,7 +1,6 @@
 #ifndef FRONTEND_HPP
 #define FRONTEND_HPP
 
-#include<string>
 namespace FE
 {
 	int StringExpr(char* x);
@@ -32,5 +31,19 @@ namespace FE
 	int LValID(char*);
 	int LValMemberAccess(int, char*);
 	int LValArrayAccess(int, int);
+
+	int NewArguments(int);
+	int StackArguments(int, int);
+
+	int AssignStmt(int, int);
+	int IfStmt(int, int, int);
+	int WhileStmt(int, int);
+	int RepeatStmt(int, int);
+	int ForStmt(char*, int, bool, int, int);
+	int StopStmt();
+	int ReturnStmt(int);
+	int ReadStmt(int);
+	int WriteStmt(int);
+	int ProcCall(char*, int);
 };
 #endif

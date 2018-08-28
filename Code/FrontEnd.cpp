@@ -6,6 +6,7 @@
 #include "SymbolTable.hpp"
 #include "Symbol.hpp"
 #include "Expressions/Expression.hpp"
+#include "Statements/Statement.hpp"
 #include "LValue.hpp"
 
 
@@ -33,6 +34,17 @@
 #include "Expressions/sub.hpp"
 #include "Expressions/succ.hpp"
 #include "Expressions/umin.hpp"
+
+#include "Statements/AssignStatement.hpp"
+#include "Statements/ForStatement.hpp"
+#include "Statements/IfStatement.hpp"
+#include "Statements/ProcCall.hpp"
+#include "Statements/ReadStatement.hpp"
+#include "Statements/RepeatStatement.hpp"
+#include "Statements/ReturnStatement.hpp"
+#include "Statements/StopStatement.hpp"
+#include "Statements/WhileStatement.hpp"
+#include "Statements/WriteStatement.hpp"
 
 template <typename T>
 class NodeList
@@ -74,6 +86,8 @@ class FrontEnd
     //some list of expressions
     NodeList<Expression> expressions;
     NodeList<LValue> lValues;
+    NodeList<std::vector<std::shared_ptr<Expression>>> arguments;
+    NodeList<Statement> statements;
     
     private:
     static std::shared_ptr<FrontEnd> fe;
@@ -236,4 +250,33 @@ int FE::LValArrayAccess(int base, int access){
 }
 #pragma endregion
 
+#pragma region arguments
+int FE::NewArguments(int expr){
+    auto fe = FrontEnd::instance();
+    std::vector<std::shared_ptr<Expression>> vec;
+    vec.push_back(fe->expressions.get(expr));
+    return fe->arguments.add(std::make_shared<std::vector<std::shared_ptr<Expression>>>(vec));
+}
+int FE::StackArguments(int list, int expr){
+    auto fe = FrontEnd::instance();
+    auto vec = fe->arguments.get(list); //vec is list of arugments
+    vec->push_back(fe->expressions.get(expr)); // add expression to list  of args
+    return list;        // return list number
+}
+#pragma endregion
 
+#pragma region statements
+int FE::AssignStmt(int lval, int expr){}
+int FE::IfStmt(int ifList, int elifList, int optElse){}
+int FE::WhileStmt(int cond, int stmts){}
+int FE::RepeatStmt(int stmts, int cond){}
+int FE::ForStmt(char* id, int begin, bool toDownTo, int end, int slist){}
+int FE::StopStmt(){}
+int FE::ReturnStmt(int expr){}
+int FE::ReadStmt(int lvals){}
+int FE::WriteStmt(int argList){
+    auto fe = FrontEnd::instance();
+    fe->statements.add(std::make_shared<WriteStatement>(fe->arguments.get(argList)));
+}
+int FE::ProcCall(char* id, int argList){}
+#pragma endregion

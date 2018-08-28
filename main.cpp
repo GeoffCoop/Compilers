@@ -4,6 +4,6 @@ extern int yyparse();
 
 int main()
 {
-	initializeProgram();
+	//initializeProgram();
 	yyparse();
 };
