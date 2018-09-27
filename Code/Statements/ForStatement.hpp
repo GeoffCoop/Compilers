@@ -7,14 +7,14 @@
 #include <vector>
 
 
-class ForStatemnet : public Statement
+class ForStatement : public Statement
 {
 public:
-    ForStatemnet();
+    ForStatement();
 
 private:
     //entry in ST
-    bool toDownTo;
+    bool toDownTo; //downTo = true/1; to = false/0;
     std::shared_ptr<Expression> start;
     std::shared_ptr<Expression> end;
     std::vector<std::shared_ptr<Statement>> statements;

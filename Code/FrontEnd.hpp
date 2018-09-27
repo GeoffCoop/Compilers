@@ -31,12 +31,16 @@ namespace FE
 	int LValID(char*);
 	int LValMemberAccess(int, char*);
 	int LValArrayAccess(int, int);
+	int NewLValList(int);
+	int StackLVal(int, int);
 
 	int NewArguments(int);
 	int StackArguments(int, int);
 
 	int AssignStmt(int, int);
+	int MergeConditional(int, int);
 	int IfStmt(int, int, int);
+	int StackElif(int, int);
 	int WhileStmt(int, int);
 	int RepeatStmt(int, int);
 	int ForStmt(char*, int, bool, int, int);
@@ -45,5 +49,7 @@ namespace FE
 	int ReadStmt(int);
 	int WriteStmt(int);
 	int ProcCall(char*, int);
+	int NewStatementSequence(int);
+	int StackStatementSequence(int, int);
 };
 #endif

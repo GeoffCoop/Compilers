@@ -94,6 +94,24 @@ void yyerror(const char*);
 %type <int_val> OptArguments
 %type <int_val> Arguments
 %type <int_val> LValue
+%type <int_val> ProcedureCall
+%type <int_val> WriteArgs
+%type <int_val>	WriteStatement
+%type <int_val> LValues
+%type <int_val> ReadStatement
+%type <int_val> ReturnStatement
+%type <int_val> StopStatement
+%type <int_val> ToDownTo
+%type <int_val> ForStatement
+%type <int_val> RepeatStatement
+%type <int_val> WhileStatement
+%type <int_val> OptElse
+%type <int_val> ElseIf
+%type <int_val> IfStatement
+%type <int_val> Assignment
+%type <int_val> Statement
+%type <int_val> StatementSequence
+
 
 %%
 Program: ProgramHead Block DOT_SYMBOL{}
@@ -192,63 +210,63 @@ VarDecls: VarDecl
 VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
 	;
 
-StatementSequence: Statement {}
-	| StatementSequence SCOLON_SYMBOL Statement
+StatementSequence: Statement 					{ $$ = FE::NewStatementSequence($1); }
+	| StatementSequence SCOLON_SYMBOL Statement	{ $$ = FE::StackStatementSequence($1,$3); }
 	;
 
-Statement: Assignment		{}
-	| IfStatement			{}
-	| WhileStatement		{}
-	| RepeatStatement		{}
-	| ForStatement			{}
-	| StopStatement			{}
-	| ReturnStatement		{}
-	| ReadStatement			{}
-	| WriteStatement		{}
-	| ProcedureCall			{}
-	|						{}
+Statement: Assignment		{ $$ = $1; }
+	| IfStatement			{ $$ = $1; }
+	| WhileStatement		{ $$ = $1; }
+	| RepeatStatement		{ $$ = $1; }
+	| ForStatement			{ $$ = $1; }
+	| StopStatement			{ $$ = $1; }
+	| ReturnStatement		{ $$ = $1; }
+	| ReadStatement			{ $$ = $1; }
+	| WriteStatement		{ $$ = $1; }
+	| ProcedureCall			{ $$ = $1; }
+	|						{ $$ = -1; }
 	;
 
-Assignment: LValue ASSIGN_SYMBOL Expression {}
+Assignment: LValue ASSIGN_SYMBOL Expression { $$ = FE::AssignStmt($1, $3); }
 	;
 
-IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{}
+IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{ $$ = FE::IfStmt(FE::MergeConditional($2,$4),$5, $6); }
 	;
 
 
-ElseIf: ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf
-	|
+ElseIf: ElseIf ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence	{ $$ = FE::StackElif($1, FE::MergeConditional($3,$5));}
+	|																	{ $$ = -1; } 
 	;
 
 OptElse: 
-	| ELSE_SYMBOL StatementSequence {}
+	| ELSE_SYMBOL StatementSequence { $$ = $2; }
 	;
 
-WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL
+WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL	{ $$ = FE::WhileStmt($2, $4); }
 	;
 
-RepeatStatement: REPEAT_SYMBOL StatementSequence UNTIL_SYMBOL Expression
+RepeatStatement: REPEAT_SYMBOL StatementSequence UNTIL_SYMBOL Expression { $$ = FE::RepeatStmt($2, $4); }
 	;
 
-ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL {}
+ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL { $$ = FE::ForStmt($2, $4, $5, $6, $8); }
 	;
 
-ToDownTo: TO_SYMBOL
-	| DOWNTO_SYMBOL
+ToDownTo: TO_SYMBOL	{ $$ = 0; }
+	| DOWNTO_SYMBOL	{ $$ = 1; }
 	;
 
-StopStatement: STOP_SYMBOL
+StopStatement: STOP_SYMBOL	{ $$ = FE::StopStmt(); }
 	;
 
-ReturnStatement: RETURN_SYMBOL	{}
-	| RETURN_SYMBOL Expression
+ReturnStatement: RETURN_SYMBOL	{ $$ = FE::ReturnStmt(-1); }
+	| RETURN_SYMBOL Expression	{ $$ = FE::ReturnStmt($2); }
 	;
 
-ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL	{}
+ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL	{	$$ = FE::ReadStmt($3); }
 	;
 
-LValues: LValues COMMA_SYMBOL LValue	{}
-	| LValue							{}
+LValues: LValues COMMA_SYMBOL LValue	{ $$ = FE::StackLVal($1, $3); 	}
+	| LValue							{ $$ = FE::NewLValList($1); }
 	;
 
 WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStatement($3); }

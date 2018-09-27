@@ -88,6 +88,18 @@ class FrontEnd
     NodeList<LValue> lValues;
     NodeList<std::vector<std::shared_ptr<Expression>>> arguments;
     NodeList<Statement> statements;
+    NodeList<std::vector<std::shared_ptr<LValue>>> lValList;
+    NodeList<std::vector<std::shared_ptr<Statement>>> slist;
+    typedef NodeList<std::pair<
+        std::shared_ptr<Expression>,
+        std::vector<std::shared_ptr<Statement>>>>
+            condStmt;
+    condStmt conditional;
+    typedef NodeList<std::vector<std::shared_ptr<std::pair<
+        std::shared_ptr<Expression>,
+        std::vector<std::shared_ptr<Statement>>>>>>
+            condList;
+    condList conditionalList;
     
     private:
     static std::shared_ptr<FrontEnd> fe;
@@ -248,6 +260,18 @@ int FE::LValArrayAccess(int base, int access){
     auto expr = fe->expressions.get(access);
     return fe->lValues.add(std::make_shared<ArrayAccesLValue>(lval, expr));
 }
+int FE::NewLValList(int lVal){
+    auto fe = FrontEnd::instance();
+    std::vector<std::shared_ptr<LValue>> vec;
+    vec.push_back(fe->lValues.get(lVal));
+    return fe->lValList.add(std::make_shared<std::vector<std::shared_ptr<LValue>>>(vec));
+}
+int FE::StackLVal(int list, int lVal){
+    auto fe = FrontEnd::instance();
+    auto vec = fe->lValList.get(list);
+    vec->push_back(fe->lValues.get(lVal));
+    return list;
+}
 #pragma endregion
 
 #pragma region arguments
@@ -266,17 +290,99 @@ int FE::StackArguments(int list, int expr){
 #pragma endregion
 
 #pragma region statements
-int FE::AssignStmt(int lval, int expr){}
-int FE::IfStmt(int ifList, int elifList, int optElse){}
-int FE::WhileStmt(int cond, int stmts){}
-int FE::RepeatStmt(int stmts, int cond){}
-int FE::ForStmt(char* id, int begin, bool toDownTo, int end, int slist){}
-int FE::StopStmt(){}
-int FE::ReturnStmt(int expr){}
-int FE::ReadStmt(int lvals){}
+int FE::AssignStmt(int lval, int expr){
+    auto fe = FrontEnd::instance();
+    auto lv = fe->lValues.get(lval);
+    auto e = fe-> expressions.get(expr);
+    return fe->statements.add(std::make_shared<AssignStatement>(lv, e));
+}
+int FE::MergeConditional(int expr, int stmts){
+    auto fe = FrontEnd::instance();
+    auto e = fe->expressions.get(expr);
+    auto s = fe->slist.get(stmts);
+    return fe->conditional.add(std::make_shared<std::pair<std::shared_ptr<Expression>, std::vector<std::shared_ptr<Statement>>>>(e,s));
+}
+int FE::IfStmt(int ifList, int elifList, int optElse){
+    auto fe = FrontEnd::instance();
+    auto i = fe->conditional.get(ifList);
+    auto eil = fe->conditionalList.get(elifList);
+    auto e = fe->slist;
+    return fe->statements.add(std::make_shared<IfStatement>(i,eil,e));
+}
+int FE::StackElif(int list, int elif){
+    auto fe = FrontEnd::instance();
+    
+    //new elif list
+    if (list == -1){
+        std::vector<std::shared_ptr<std::pair<
+            std::shared_ptr<Expression>,
+            std::vector<std::shared_ptr<Statement>>>>> vec;
+        vec.push_back(fe->conditional.get(elif));
+        return fe->conditionalList.add(std::make_shared<
+            std::vector<std::shared_ptr<std::pair<
+                std::shared_ptr<Expression>,
+                std::vector<std::shared_ptr<Statement>>>>>>
+                (vec));
+    }
+    else {
+        auto vec = fe->conditionalList.get(list);
+        vec->push_back(fe->conditional.get(elif));
+        return list;
+    }
+}
+int FE::WhileStmt(int cond, int stmts){
+    auto fe = FrontEnd::instance();
+    auto c = fe->expressions.get(cond);
+    auto s = fe->slist.get(stmts);
+    return fe->statements.add(std::make_shared<WhileStatement>(c,s));
+}
+int FE::RepeatStmt(int stmts, int cond){
+    auto fe = FrontEnd::instance();
+    auto s = fe->slist.get(stmts);
+    auto c = fe->expressions.get(cond);
+    return fe->statements.add(std::make_shared<RepeatStatement>(s,c));
+}
+int FE::ForStmt(char* id, int begin, bool toDownTo, int end, int stmts){
+    auto fe = FrontEnd::instance();
+    // these need to pull values from wherever first
+    auto b = fe->expressions.get(begin);
+    auto e = fe->expressions.get(end);
+    auto s = fe->slist.get(stmts);
+    return fe->statements.add(std::make_shared<ForStatement>(id, b, toDownTo, e, s));
+}
+int FE::StopStmt(){
+    auto fe = FrontEnd::instance();
+    return fe->statements.add(std::make_shared<StopStatement>());
+}
+int FE::ReturnStmt(int expr){
+    auto fe = FrontEnd::instance();
+    if (expr == -1) {
+        return fe->statements.add(std::make_shared<ReturnStatement>(nullptr));
+    }
+    else {
+        return fe->statements.add(std::make_shared<ReturnStatement>(fe->expressions.get(expr)));
+    }
+}
+int FE::ReadStmt(int lvals){
+    auto fe = FrontEnd::instance();
+    return fe->statements.add(std::make_shared<ReadStatement>(fe->lValList.get(lvals)));
+}
 int FE::WriteStmt(int argList){
     auto fe = FrontEnd::instance();
-    fe->statements.add(std::make_shared<WriteStatement>(fe->arguments.get(argList)));
+    return fe->statements.add(std::make_shared<WriteStatement>(fe->arguments.get(argList)));
 }
 int FE::ProcCall(char* id, int argList){}
+int FE::NewStatementSequence(int stmt){
+    auto fe = FrontEnd::instance();
+    std::vector<std::shared_ptr<Statement>> vec;
+    vec.push_back(fe->statements.get(stmt));
+    return fe->slist.add(std::make_shared<std::vector<std::shared_ptr<Statement>>>(vec));
+}
+int FE::StackStatementSequence(int list, int stmt){
+    auto fe = FrontEnd::instance();
+    auto ss = fe->slist.get(list);
+    ss->push_back(fe->statements.get(stmt));
+    return list;
+}
+
 #pragma endregion
