@@ -210,8 +210,8 @@ VarDecls: VarDecl
 VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
 	;
 
-StatementSequence: Statement 					{ $$ = FE::NewStatementSequence($1); }
-	| StatementSequence SCOLON_SYMBOL Statement	{ $$ = FE::StackStatementSequence($1,$3); }
+StatementSequence: Statement 					{ $$ = NewStatementSequence($1); }
+	| StatementSequence SCOLON_SYMBOL Statement	{ $$ = StackStatementSequence($1,$3); }
 	;
 
 Statement: Assignment		{ $$ = $1; }
@@ -227,14 +227,14 @@ Statement: Assignment		{ $$ = $1; }
 	|						{ $$ = -1; }
 	;
 
-Assignment: LValue ASSIGN_SYMBOL Expression { $$ = FE::AssignStmt($1, $3); }
+Assignment: LValue ASSIGN_SYMBOL Expression { $$ = AssignStmt($1, $3); }
 	;
 
-IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{ $$ = FE::IfStmt(FE::MergeConditional($2,$4),$5, $6); }
+IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{ $$ = IfStmt(MergeConditional($2,$4),$5, $6); }
 	;
 
 
-ElseIf: ElseIf ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence	{ $$ = FE::StackElif($1, FE::MergeConditional($3,$5));}
+ElseIf: ElseIf ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence	{ $$ = StackElif($1, MergeConditional($3,$5));}
 	|																	{ $$ = -1; } 
 	;
 
@@ -242,80 +242,80 @@ OptElse:
 	| ELSE_SYMBOL StatementSequence { $$ = $2; }
 	;
 
-WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL	{ $$ = FE::WhileStmt($2, $4); }
+WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL	{ $$ = WhileStmt($2, $4); }
 	;
 
-RepeatStatement: REPEAT_SYMBOL StatementSequence UNTIL_SYMBOL Expression { $$ = FE::RepeatStmt($2, $4); }
+RepeatStatement: REPEAT_SYMBOL StatementSequence UNTIL_SYMBOL Expression { $$ = RepeatStmt($2, $4); }
 	;
 
-ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL { $$ = FE::ForStmt($2, $4, $5, $6, $8); }
+ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL { $$ = ForStmt($2, $4, $5, $6, $8); }
 	;
 
 ToDownTo: TO_SYMBOL	{ $$ = 0; }
 	| DOWNTO_SYMBOL	{ $$ = 1; }
 	;
 
-StopStatement: STOP_SYMBOL	{ $$ = FE::StopStmt(); }
+StopStatement: STOP_SYMBOL	{ $$ = StopStmt(); }
 	;
 
-ReturnStatement: RETURN_SYMBOL	{ $$ = FE::ReturnStmt(-1); }
-	| RETURN_SYMBOL Expression	{ $$ = FE::ReturnStmt($2); }
+ReturnStatement: RETURN_SYMBOL	{ $$ = ReturnStmt(-1); }
+	| RETURN_SYMBOL Expression	{ $$ = ReturnStmt($2); }
 	;
 
-ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL	{	$$ = FE::ReadStmt($3); }
+ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL	{	$$ = ReadStmt($3); }
 	;
 
-LValues: LValues COMMA_SYMBOL LValue	{ $$ = FE::StackLVal($1, $3); 	}
-	| LValue							{ $$ = FE::NewLValList($1); }
+LValues: LValues COMMA_SYMBOL LValue	{ $$ = StackLVal($1, $3); 	}
+	| LValue							{ $$ = NewLValList($1); }
 	;
 
-WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStatement($3); }
+WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStmt($3); }
 	;
 
-WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ $$ = FE::StackArgument($1, $3); }
-	| Expression								{ $$ = FE::NewArgument($1); }
+WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ $$ = StackArgument($1, $3); }
+	| Expression								{ $$ = NewArgument($1); }
 	;
 
-Arguments: Arguments COMMA_SYMBOL Expression 	{ $$ = FE::StackArgument($1, $3); }
-	| Expression								{ $$ = FE::NewArgument($1); }
+Arguments: Arguments COMMA_SYMBOL Expression 	{ $$ = StackArgument($1, $3); }
+	| Expression								{ $$ = NewArgument($1); }
 	;
 
-ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = FE::ProcCall($3); }
+ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = ProcCall($3); }
 	;
 
 OptArguments: 	{$$ = -1;}
 	| Arguments 	{$$ = $1;}
 	;
 
-Expression: Expression OR_SYMBOL Expression	{$$=FE::OrExpr($1,$3);}
-	| Expression AND_SYMBOL Expression	{$$=FE::AndExpr($1,$3);}
-	| Expression EQUAL_SYMBOL Expression	{$$=FE::EQExpr($1,$3);}
-	| Expression NOTEQUAL_SYMBOL Expression	{$$=FE::NEExpr($1,$3);}
-	| Expression LTE_SYMBOL Expression	{$$= FE::LTEExpr($1,$3);}	
-	| Expression GTE_SYMBOL Expression	{ $$ = FE::GTEExpr($1,$3);}
-	| Expression LT_SYMBOL Expression	{ $$ = FE::LTExpr($1,$3);}
-	| Expression GT_SYMBOL Expression	{ $$ = FE::GTExpr($1,$3); }
-	| Expression MINUS_SYMBOL Expression	{ $$ = FE::MinExpr($1,$3); }
-	| Expression MULT_SYMBOL Expression	{ $$ = FE::MultExpr($1,$3); }
-	| Expression DIV_SYMBOL Expression	{ $$ = FE::DivExpr($1,$3); }
-	| Expression MODULO_SYMBOL Expression	{ $$ = FE::ModExpr($1,$3); }
-	| NOT_SYMBOL Expression			{ $$ = FE::NotExpr($2); }
-	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL		{ $$ = FE::UMinusExpr($2); }
+Expression: Expression OR_SYMBOL Expression	{$$=OrExpr($1,$3);}
+	| Expression AND_SYMBOL Expression	{$$=AndExpr($1,$3);}
+	| Expression EQUAL_SYMBOL Expression	{$$=EQExpr($1,$3);}
+	| Expression NOTEQUAL_SYMBOL Expression	{$$=NEExpr($1,$3);}
+	| Expression LTE_SYMBOL Expression	{$$= LTEExpr($1,$3);}	
+	| Expression GTE_SYMBOL Expression	{ $$ = GTEExpr($1,$3);}
+	| Expression LT_SYMBOL Expression	{ $$ = LTExpr($1,$3);}
+	| Expression GT_SYMBOL Expression	{ $$ = GTExpr($1,$3); }
+	| Expression MINUS_SYMBOL Expression	{ $$ = MinExpr($1,$3); }
+	| Expression MULT_SYMBOL Expression	{ $$ = MultExpr($1,$3); }
+	| Expression DIV_SYMBOL Expression	{ $$ = DivExpr($1,$3); }
+	| Expression MODULO_SYMBOL Expression	{ $$ = ModExpr($1,$3); }
+	| NOT_SYMBOL Expression			{ $$ = NotExpr($2); }
+	| MINUS_SYMBOL Expression %prec UNARYMINUS_SYMBOL		{ $$ = UMinusExpr($2); }
 	| LPAREN_SYMBOL Expression RPAREN_SYMBOL { $$ = $2; }
-	| IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = FE::CallFunction($1, $3); }
-	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::ChrExpr($3); }
-	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = FE::OrdExpr($3); }
-	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = FE::PredExpr($3); }
-	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = FE::SuccExpr($3); }
-	| LValue					{ $$ = FE::LValueExpr($1); }
-	| CHRCONST_SYMBOL			{ $$ = FE::CharExpr($1); }
-	| INT_SYMBOL				{ $$ = FE::IntExpr($1); }
-	| STRING_SYMBOL				{ $$ = FE::StringExpr($1); }
+	| IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = CallFunction($1, $3); }
+	| CHR_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = ChrExpr($3); }
+	| ORD_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{ $$ = OrdExpr($3); }
+	| PRED_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = PredExpr($3); }
+	| SUCC_SYMBOL LPAREN_SYMBOL Expression RPAREN_SYMBOL		{$$ = SuccExpr($3); }
+	| LValue					{ $$ = LValueExpr($1); }
+	| CHRCONST_SYMBOL			{ $$ = CharExpr($1); }
+	| INT_SYMBOL				{ $$ = IntExpr($1); }
+	| STRING_SYMBOL				{ $$ = StringExpr($1); }
 	;
 
-LValue: IDENT_SYMBOL										{ $$ = FE::LValID($1); }
-	| LValue DOT_SYMBOL IDENT_SYMBOL						{ $$ = FE::LValMemberAccess($1, $3); }
-	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = FE::LValArrayAccess($1, $3);}
+LValue: IDENT_SYMBOL										{ $$ = LValID($1); }
+	| LValue DOT_SYMBOL IDENT_SYMBOL						{ $$ = LValMemberAccess($1, $3); }
+	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = LValArrayAccess($1, $3);}
 	;
 
 %%

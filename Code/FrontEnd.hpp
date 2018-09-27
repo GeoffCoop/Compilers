@@ -33,8 +33,8 @@
 	int NewLValList(int);
 	int StackLVal(int, int);
 
-	int NewArguments(int);
-	int StackArguments(int, int);
+	int NewArgument(int);
+	int StackArgument(int, int);
 
 	int AssignStmt(int, int);
 	int MergeConditional(int, int);
