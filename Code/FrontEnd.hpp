@@ -1,8 +1,7 @@
 #ifndef FRONTEND_HPP
 #define FRONTEND_HPP
 
-namespace FE
-{
+
 	int StringExpr(char* x);
 	int IntExpr(int x);
 	int CharExpr(char x);
@@ -51,5 +50,5 @@ namespace FE
 	int ProcCall(char*, int);
 	int NewStatementSequence(int);
 	int StackStatementSequence(int, int);
-};
+	
 #endif
