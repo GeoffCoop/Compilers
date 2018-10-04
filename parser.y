@@ -280,7 +280,7 @@ Arguments: Arguments COMMA_SYMBOL Expression 	{ $$ = StackArgument($1, $3); }
 	| Expression								{ $$ = NewArgument($1); }
 	;
 
-ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = ProcCall($3); }
+ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = ProcCall($1,$3); }
 	;
 
 OptArguments: 	{$$ = -1;}
