@@ -16,7 +16,7 @@ class LValueExpression : public Expression
 	private:
 	std::shared_ptr<LValue> lValue;
 
-}
+};
 
 
 #endif

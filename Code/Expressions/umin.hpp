@@ -5,7 +5,7 @@
 
 class UMin : public Expression
 {
-}
+};
 
 
 #endif

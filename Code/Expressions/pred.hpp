@@ -5,7 +5,6 @@
 
 class Pred : public Expression
 {
-}
-
+};
 
 #endif

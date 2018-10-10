@@ -5,7 +5,7 @@
 
 class Succ : public Expression
 {
-}
+};
 
 
 #endif

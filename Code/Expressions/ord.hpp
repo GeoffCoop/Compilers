@@ -6,7 +6,7 @@
 class Ord : public Expression
 {
     Ord();
-}
+};
 
 
 #endif

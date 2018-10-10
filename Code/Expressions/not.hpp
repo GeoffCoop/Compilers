@@ -5,7 +5,7 @@
 
 class Not : public Expression
 {
-}
+};
 
 
 #endif

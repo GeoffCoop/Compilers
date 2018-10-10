@@ -6,7 +6,7 @@
 
 class FunctionCall : public Expression
 {
-}
+};
 
 
 #endif

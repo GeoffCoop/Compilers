@@ -5,7 +5,7 @@
 
 class Chr : public Expression
 {
-}
+};
 
 
 #endif
