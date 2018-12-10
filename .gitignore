@@ -12,3 +12,4 @@ scanner.hpp
 parser.cpp
 parser.hpp
 .vs*
+compilers.code-workspace
