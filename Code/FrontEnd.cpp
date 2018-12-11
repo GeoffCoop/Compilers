@@ -85,7 +85,7 @@ public:
     std::shared_ptr<SymbolTable> getSymbolTable()   {
         return symbolTable;
     }
-
+    
     //some list of expressions
     NodeList<Expression> expressions;
     NodeList<LValue> lValues;
@@ -108,7 +108,7 @@ public:
 private:
     static std::shared_ptr<FrontEnd> fe;
     std::shared_ptr<SymbolTable> symbolTable;
-    std::shared_ptr<StringTable> stringTable = StringTable::instance();
+    std::shared_ptr<StringTable> stringTable;
 };
 
 std::shared_ptr<FrontEnd> FrontEnd::fe;
@@ -117,6 +117,11 @@ std::shared_ptr<FrontEnd> FrontEnd::fe;
 int StringExpr(char* x){
 //    auto fe = FrontEnd::instance();
 //    return fe->expressions.add(std::make_shared<StringExpression>(x));
+    auto st = StringTable::instance();
+    std::cout << st <<std::endl;
+    int i = st->addString(std::string(x));  
+    std::string out = "$li $t"+ std::to_string(getRegister()) + std::string(", st") + std::to_string(123);
+    std::cout << out << std::endl;
 }
 int IntExpr(int x){
       auto fe = FrontEnd::instance();

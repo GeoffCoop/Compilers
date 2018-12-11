@@ -8,10 +8,9 @@
 
 class StringTable {
     public:
-    StringTable() {}
     static std::shared_ptr<StringTable> instance() {
         if (!singleton){
-            singleton = std::shared_ptr<StringTable>(new StringTable);
+            singleton = std::shared_ptr<StringTable>();
         }
         return singleton;
     }
@@ -24,5 +23,7 @@ private:
     std::map<std::string, int> s_table;
     std::map<int, std::string> id_table;
 };
+
+std::shared_ptr<StringTable> StringTable::singleton;
 
 #endif
