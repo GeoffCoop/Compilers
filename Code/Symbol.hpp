@@ -3,7 +3,7 @@
 
 #include <string>
 #include "Type.hpp"
-
+#include <memory>
 class Symbol{
 public:
 

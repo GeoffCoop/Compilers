@@ -269,18 +269,18 @@ LValues: LValues COMMA_SYMBOL LValue	{ $$ = StackLVal($1, $3); 	}
 	| LValue							{ $$ = NewLValList($1); }
 	;
 
-WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStmt($3); }
+WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ }
 	;
 
-WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ $$ = StackArgument($1, $3); }
-	| Expression								{ $$ = NewArgument($1); }
+WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ }
+	| Expression								{ }
 	;
 
-Arguments: Arguments COMMA_SYMBOL Expression 	{ $$ = StackArgument($1, $3); }
-	| Expression								{ $$ = NewArgument($1); }
+Arguments: Arguments COMMA_SYMBOL Expression 	{ }
+	| Expression								{}
 	;
 
-ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = ProcCall($1,$3); }
+ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ }
 	;
 
 OptArguments: 	{$$ = -1;}
@@ -313,9 +313,9 @@ Expression: Expression OR_SYMBOL Expression	{$$=OrExpr($1,$3);}
 	| STRING_SYMBOL				{ $$ = StringExpr($1); }
 	;
 
-LValue: IDENT_SYMBOL										{ $$ = LValID($1); }
-	| LValue DOT_SYMBOL IDENT_SYMBOL						{ $$ = LValMemberAccess($1, $3); }
-	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = LValArrayAccess($1, $3);}
+LValue: IDENT_SYMBOL										{}
+	| LValue DOT_SYMBOL IDENT_SYMBOL						{}
+	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{}
 	;
 
 %%

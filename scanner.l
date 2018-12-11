@@ -68,7 +68,7 @@ write|WRITE		{  return WRITE_SYMBOL;}
 ":="			{  return ASSIGN_SYMBOL;}
 "%"			{  return MODULO_SYMBOL;}
 
-[a-zA-Z][a-zA-Z0-9_]*	{yylval.str_val = strdup(yytext); cout << "Line:  " << lineNum << "\tIdent: " << yytext << endl; return IDENT_SYMBOL; }
+[a-zA-Z][a-zA-Z0-9_]*	{yylval.str_val = strdup(yytext); return IDENT_SYMBOL; }
 		
 [0][0-7]+		{ yylval.int_val = strtol(yytext, nullptr, 0); return INT_SYMBOL;}
 [0][x][0-9a-fA-F]+	{ yylval.int_val = strtol(yytext, nullptr, 0); return INT_SYMBOL;}

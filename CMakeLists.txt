@@ -37,6 +37,8 @@ set(code_srcs
 	Code/Type.hpp
 	Code/LValue.hpp
 	Code/Program.hpp
+	Code/ThreeAddressInstruction.hpp
+	Code/ThreeAddressInstruction.cpp
 )
 
 list(APPEND cpsl_srcs ${code_srcs})
