@@ -8,7 +8,8 @@
 #include "Expressions/Expression.hpp"
 #include "Statements/Statement.hpp"
 #include "LValue.hpp"
-
+#include "ThreeAddressInstruction.hpp"
+#include "RegAllocation.hpp"
 
 #include "Expressions/stringExpression.hpp"
 #include "Expressions/intExpression.hpp"
@@ -90,6 +91,7 @@ class FrontEnd
     NodeList<Statement> statements;
     NodeList<std::vector<std::shared_ptr<LValue>>> lValList;
     NodeList<std::vector<std::shared_ptr<Statement>>> slist;
+    NodeList<std::vector<std::shared_ptr<ThreeAddressInstruction>>> instructions;
     typedef NodeList<std::pair<
         std::shared_ptr<Expression>,
         std::vector<std::shared_ptr<Statement>>>>
@@ -118,7 +120,9 @@ int IntExpr(int x){
 }
 int CharExpr(char x){
     auto fe = FrontEnd::instance();
-    return fe->expressions.add(std::make_shared<CharExpression>(x));
+    // return fe->expressions.add(std::make_shared<CharExpression>(x));
+    fe->instructions.add(std::make_shared<ThreeAddressInstruction>(ThreeAddressInstruction::LoadValue, getRegister(), x, 0))
+    // cast char as an int
 }
 // The following need to retrieve other expressions first
 int SuccExpr(int x){
