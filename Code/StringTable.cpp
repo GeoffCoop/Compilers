@@ -8,6 +8,8 @@ int label() {
     return count++;
 }
 
+std::shared_ptr<StringTable> StringTable::singleton;
+
 int StringTable::addString(std::string s){
     auto f = s_table.find(s);
     if (f == s_table.end()) {

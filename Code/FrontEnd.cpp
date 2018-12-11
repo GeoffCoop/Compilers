@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 
+#include "StringTable.hpp"
 #include "SymbolTable.hpp"
 #include "Symbol.hpp"
 #include "Expressions/Expression.hpp"
@@ -107,6 +108,7 @@ public:
 private:
     static std::shared_ptr<FrontEnd> fe;
     std::shared_ptr<SymbolTable> symbolTable;
+    std::shared_ptr<StringTable> stringTable = StringTable::instance();
 };
 
 std::shared_ptr<FrontEnd> FrontEnd::fe;

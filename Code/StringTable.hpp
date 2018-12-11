@@ -1,3 +1,6 @@
+#ifndef STRINGTABLE_HPP
+#define STRINGTABLE_HPP
+
 #include <map>
 #include <string>
 #include <memory>
@@ -21,3 +24,5 @@ private:
     std::map<std::string, int> s_table;
     std::map<int, std::string> id_table;
 };
+
+#endif
