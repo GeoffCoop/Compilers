@@ -118,9 +118,8 @@ int StringExpr(char* x){
 //    auto fe = FrontEnd::instance();
 //    return fe->expressions.add(std::make_shared<StringExpression>(x));
     auto st = StringTable::instance();
-    std::cout << st <<std::endl;
-    int i = st->addString(std::string(x));  
-    std::string out = "$li $t"+ std::to_string(getRegister()) + std::string(", st") + std::to_string(123);
+    int i = st->addString(std::string(x)); 
+    std::string out = "$li $t"+ std::to_string(getRegister()) + std::string(", st") + std::to_string(i);
     std::cout << out << std::endl;
 }
 int IntExpr(int x){
