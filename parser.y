@@ -296,6 +296,7 @@ Expression: Expression OR_SYMBOL Expression	{$$=OrExpr($1,$3);}
 	| Expression LT_SYMBOL Expression	{ $$ = LTExpr($1,$3);}
 	| Expression GT_SYMBOL Expression	{ $$ = GTExpr($1,$3); }
 	| Expression MINUS_SYMBOL Expression	{ $$ = MinExpr($1,$3); }
+	| Expression PLUS_SYMBOL Expression	{ $$ = PlusExpr($1,$3); }
 	| Expression MULT_SYMBOL Expression	{ $$ = MultExpr($1,$3); }
 	| Expression DIV_SYMBOL Expression	{ $$ = DivExpr($1,$3); }
 	| Expression MODULO_SYMBOL Expression	{ $$ = ModExpr($1,$3); }

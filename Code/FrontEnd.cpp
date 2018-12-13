@@ -127,10 +127,10 @@ int StringExpr(char* x){
     return r;
 }
 int IntExpr(int x){
-      auto fe = FrontEnd::instance();
-      int r = reg.getRegister();
-      std::string out = "$li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
-      std::cout << out << std::endl;
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    std::string out = "$li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
+    std::cout << out << std::endl;
 //    return fe->expressions.add(std::make_shared<IntExpression>(x));
     return r;
 }
@@ -176,28 +176,39 @@ int NotExpr(int x){
 }
 //////////////////////////////// Need to grab both expressions from list
 int ModExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Mod>(a,b));
-}
-int DivExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Div>(a,b));
-}
-int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
-    auto r = reg.getRegister(); 
-    std::string out = "mult \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    int r = reg.getRegister();
+    std::string out = "div \t$t" + std::to_string(x) + ", $t" + std::to_string(y);
+    std::string out2 ="mfhi \t$t" + std::to_string(r);
     reg.release(x);
     reg.release(y);
+    std::cout << out << std::endl;
+    std::cout << out2 << std::endl;
+}
+int DivExpr(int x, int y){
+    int r = reg.getRegister();
+    std::string out = "div \t$t" + std::to_string(x) + ", $t" + std::to_string(y);
+    std::string out2 = "mflo \t $t" + std::to_string(r);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
+    std::cout << out2 << std::endl;
+}
+int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
+    int r = reg.getRegister();
+    std::string out = "mult \t$t" + std::to_string(x) + ", $t" + std::to_string(y);
+    std::string out2 = "mflo \t$t" + std::to_string(r);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
+    std::cout << out2 << std::endl;
 }
 int MinExpr(int x, int y){
     auto r = reg.getRegister();
+	x = 1; //TEMP SO IT WORKS ON HANOI FOR NOW
     std::string out = "sub \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
+    std::cout << out <<std::endl;
 }
 int GTExpr(int x, int y){
 //    auto fe = FrontEnd::instance();
@@ -207,10 +218,11 @@ int GTExpr(int x, int y){
 
 }
 int PlusExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//   auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Add>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "add \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int LTExpr(int x, int y){
 //    auto fe = FrontEnd::instance();

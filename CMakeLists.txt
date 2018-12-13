@@ -41,6 +41,7 @@ set(code_srcs
 	Code/ThreeAddressInstruction.cpp
 	Code/StringTable.hpp
 	Code/StringTable.cpp
+	Code/RegAllocation.hpp
 )
 
 list(APPEND cpsl_srcs ${code_srcs})
