@@ -114,7 +114,13 @@ private:
 std::shared_ptr<FrontEnd> FrontEnd::fe;
 RegAlloc reg;
 
-
+std::string initMIPS() {
+    std::string s =  "\t.text\n";
+    s += "\t.globl main\n";
+    s += "\t.data\n";
+    s += "main:\n";
+    return s;
+}
 #pragma region Expressions
 int StringExpr(char* x){
 //    auto fe = FrontEnd::instance();
@@ -211,11 +217,11 @@ int MinExpr(int x, int y){
     std::cout << out <<std::endl;
 }
 int GTExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<GT>(a,b));
-
+    auto r = reg.getRegister();
+    std::string out = "sgt \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int PlusExpr(int x, int y){
     auto r = reg.getRegister();
@@ -225,46 +231,53 @@ int PlusExpr(int x, int y){
     std::cout << out << std::endl;
 }
 int LTExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Lt>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "slt \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int GTEExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Gte>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "sge \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int LTEExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Lte>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "sle \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int NEExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<NE>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "sne \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int EQExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<EQ>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "seq \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int AndExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<And>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "and \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int OrExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//   auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Or>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "or \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
+    std::cout << out << std::endl;
 }
 int LValueExpr(int x){
 //    auto fe = FrontEnd::instance();

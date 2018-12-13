@@ -2,6 +2,8 @@
 #define FRONTEND_HPP
 
 
+	std::string initMIPS();
+	
 	int StringExpr(char* x);
 	int IntExpr(int x);
 	int CharExpr(char x);
