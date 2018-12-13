@@ -1,6 +1,7 @@
 #ifndef FRONTEND_HPP
 #define FRONTEND_HPP
 
+#include <string>
 
 	std::string initMIPS();
 	

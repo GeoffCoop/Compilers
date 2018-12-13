@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include "StringTable.hpp"
 #include "SymbolTable.hpp"
@@ -115,50 +116,46 @@ std::shared_ptr<FrontEnd> FrontEnd::fe;
 RegAlloc reg;
 
 std::string initMIPS() {
-    std::string s =  "\t.text\n";
+    std::string s =  "\t.data\n";
     s += "\t.globl main\n";
-    s += "\t.data\n";
+    s += "\t.text\n";
     s += "main:\n";
     return s;
 }
 #pragma region Expressions
 int StringExpr(char* x){
-//    auto fe = FrontEnd::instance();
-//    return fe->expressions.add(std::make_shared<StringExpression>(x));
     auto st = StringTable::instance();
     int i = st->addString(std::string(x)); 
     int r = reg.getRegister();
-    std::string out = "$li \t$t"+ std::to_string(r) + std::string(", st") + std::to_string(i);
+    std::string out = "li \t$t"+ std::to_string(r) + std::string(", st") + std::to_string(i);
     std::cout << out << std::endl;
     return r;
 }
 int IntExpr(int x){
     auto fe = FrontEnd::instance();
     int r = reg.getRegister();
-    std::string out = "$li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
+    std::string out = "li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
     std::cout << out << std::endl;
-//    return fe->expressions.add(std::make_shared<IntExpression>(x));
     return r;
 }
 int CharExpr(char x){
     auto fe = FrontEnd::instance();
     int r = reg.getRegister();
-    // return fe->expressions.add(std::make_shared<CharExpression>(x));
-    std::string out = "$li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
+    std::string out = "li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
     std::cout << out << std::endl;
-//    return fe->instructions.add(std::make_shared<ThreeAddressInstruction>(ThreeAddressInstruction::LoadValue, getRegister(), x, 0));
     return r;
 }
 // The following need to retrieve other expressions first
 int SuccExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto exp = fe->expressions.get(x);
-//    return fe->expressions.add(std::make_shared<Succ>(exp));
+    int r = reg.getRegister();
+    std::string out = "addi \t$t" + std::to_string(r) + ", $" + std::to_string(x) + ", 1";
+    reg.release(x);
+    std::cout << out << std::endl;
+    return r;
 }
 int PredExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto exp = fe->expressions.get(x);
-//    return fe->expressions.add(std::make_shared<Pred>(exp));
+    int r = reg.getRegister();
+    std::string out = "addi \t$t" + std::to_string(r) + ", $" + std::to_string(x) + ", -1";
 }
 int ChrExpr(int x){
 //    auto fe = FrontEnd::instance();
@@ -171,14 +168,18 @@ int OrdExpr(int x){
 //    return fe->expressions.add(std::make_shared<Ord>(exp));
 }
 int UMinusExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto exp = fe->expressions.get(x);
-//    return fe->expressions.add(std::make_shared<UMin>(exp));
+    int r = reg.getRegister();
+    std::string out = "sub \t$t" + std::to_string(r) + ", $0" + std::to_string(x);
+    reg.release(x);
+    std::cout << out << std::endl;
+    return r;
 }
 int NotExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto exp = fe->expressions.get(x);
-//    return fe->expressions.add(std::make_shared<Not>(exp));
+    int r = reg.getRegister();
+    std::string out = "not \t$t" + std::to_string(r) + ", $t" + std::to_string(x);
+    reg.release(x);
+    std::cout << out << std::endl;
+    return r;
 }
 //////////////////////////////// Need to grab both expressions from list
 int ModExpr(int x, int y){
@@ -189,15 +190,17 @@ int ModExpr(int x, int y){
     reg.release(y);
     std::cout << out << std::endl;
     std::cout << out2 << std::endl;
+    return r;
 }
 int DivExpr(int x, int y){
     int r = reg.getRegister();
     std::string out = "div \t$t" + std::to_string(x) + ", $t" + std::to_string(y);
-    std::string out2 = "mflo \t $t" + std::to_string(r);
+    std::string out2 = "mflo \t$t" + std::to_string(r);
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
     std::cout << out2 << std::endl;
+    return r;
 }
 int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
     int r = reg.getRegister();
@@ -207,6 +210,7 @@ int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
     reg.release(y);
     std::cout << out << std::endl;
     std::cout << out2 << std::endl;
+    return r;
 }
 int MinExpr(int x, int y){
     auto r = reg.getRegister();
@@ -215,6 +219,7 @@ int MinExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out <<std::endl;
+    return r;
 }
 int GTExpr(int x, int y){
     auto r = reg.getRegister();
@@ -222,6 +227,7 @@ int GTExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int PlusExpr(int x, int y){
     auto r = reg.getRegister();
@@ -229,6 +235,7 @@ int PlusExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int LTExpr(int x, int y){
     auto r = reg.getRegister();
@@ -236,6 +243,7 @@ int LTExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int GTEExpr(int x, int y){
     auto r = reg.getRegister();
@@ -243,6 +251,7 @@ int GTEExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int LTEExpr(int x, int y){
     auto r = reg.getRegister();
@@ -250,6 +259,7 @@ int LTEExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int NEExpr(int x, int y){
     auto r = reg.getRegister();
@@ -257,13 +267,15 @@ int NEExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int EQExpr(int x, int y){
     auto r = reg.getRegister();
     std::string out = "seq \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    std::cout << out << std::endl; 
+    return r;
 }
 int AndExpr(int x, int y){
     auto r = reg.getRegister();
@@ -271,6 +283,7 @@ int AndExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int OrExpr(int x, int y){
     auto r = reg.getRegister();
@@ -278,6 +291,7 @@ int OrExpr(int x, int y){
     reg.release(x);
     reg.release(y);
     std::cout << out << std::endl;
+    return r;
 }
 int LValueExpr(int x){
 //    auto fe = FrontEnd::instance();
