@@ -12,6 +12,7 @@ public:
 		type (type),	//type
 		m_memoryLocation(memoryLocation)
 		{}
+	int getMemLoc() { return m_memoryLocation; }
 private:
 	std::string id;
 	std::shared_ptr<Type> type;

@@ -294,9 +294,8 @@ int OrExpr(int x, int y){
     return r;
 }
 int LValueExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto lval = fe->lValues.get(x);
-//    return fe->expressions.add(std::make_shared<LValueExpression>(lval));
+    auto r = reg.getRegister();
+    // symbolTable->findEntry
 }
 
 int CallFunction(char* x, int y){
@@ -308,8 +307,16 @@ int CallFunction(char* x, int y){
 
 #pragma region LValues
 int LValID(char* id){
-//    auto fe = FrontEnd::instance();
-//    return fe->lValues.add(std::make_shared<IDLValue>(id));
+    auto fe = FrontEnd::instance();
+    auto symbol_ptr = fe->getSymbolTable()->findEntry(id);
+    if (symbol_ptr != nullptr) {
+        auto r = reg.getRegister();
+        std::string out = "lw \t$t" + std::to_string(r); + ", " + std::to_string(symbol_ptr->getMemLoc());
+    }
+    else {
+        //throw error about id not existing;
+        std::cout << "id " + std::string(id) + " doesn't exist.";
+    }
 }
 int LValMemberAccess(int base, char* ident){
 //    auto fe = FrontEnd::instance();

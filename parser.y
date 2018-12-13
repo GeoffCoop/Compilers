@@ -314,9 +314,9 @@ Expression: Expression OR_SYMBOL Expression	{$$=OrExpr($1,$3);}
 	| STRING_SYMBOL				{ $$ = StringExpr($1); }
 	;
 
-LValue: IDENT_SYMBOL										{}
+LValue: IDENT_SYMBOL										{ $$ = LValID($1);}
 	| LValue DOT_SYMBOL IDENT_SYMBOL						{}
-	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{}
+	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = LValArrayAccess($1, $3); }
 	;
 
 %%
