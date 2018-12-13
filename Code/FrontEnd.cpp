@@ -112,6 +112,8 @@ private:
 };
 
 std::shared_ptr<FrontEnd> FrontEnd::fe;
+RegAlloc reg;
+
 
 #pragma region Expressions
 int StringExpr(char* x){
@@ -119,21 +121,27 @@ int StringExpr(char* x){
 //    return fe->expressions.add(std::make_shared<StringExpression>(x));
     auto st = StringTable::instance();
     int i = st->addString(std::string(x)); 
-    std::string out = "$li $t"+ std::to_string(getRegister()) + std::string(", st") + std::to_string(i);
+    int r = reg.getRegister();
+    std::string out = "$li \t$t"+ std::to_string(r) + std::string(", st") + std::to_string(i);
     std::cout << out << std::endl;
+    return r;
 }
 int IntExpr(int x){
       auto fe = FrontEnd::instance();
-      std::string out = "$li $t" + std::to_string(getRegister()) + std::string(", ") + std::to_string(x);
+      int r = reg.getRegister();
+      std::string out = "$li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
       std::cout << out << std::endl;
 //    return fe->expressions.add(std::make_shared<IntExpression>(x));
+    return r;
 }
 int CharExpr(char x){
     auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
     // return fe->expressions.add(std::make_shared<CharExpression>(x));
-    std::cout << "$li $t" + std::to_string(getRegister()) + std::string(", ") + std::to_string(x) << std::endl; 
+    std::string out = "$li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
+    std::cout << out << std::endl;
 //    return fe->instructions.add(std::make_shared<ThreeAddressInstruction>(ThreeAddressInstruction::LoadValue, getRegister(), x, 0));
-    // cast char as an int
+    return r;
 }
 // The following need to retrieve other expressions first
 int SuccExpr(int x){
@@ -179,17 +187,17 @@ int DivExpr(int x, int y){
 //    auto b = fe->expressions.get(y);
 //    return fe->expressions.add(std::make_shared<Div>(a,b));
 }
-int MultExpr(int x, int y){
-//    auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Mult>(a,b));
+int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
+    auto r = reg.getRegister(); 
+    std::string out = "mult \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
 }
 int MinExpr(int x, int y){
-//   auto fe = FrontEnd::instance();
-//    auto a = fe->expressions.get(x);
-//    auto b = fe->expressions.get(y);
-//    return fe->expressions.add(std::make_shared<Sub>(a,b));
+    auto r = reg.getRegister();
+    std::string out = "sub \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
+    reg.release(x);
+    reg.release(y);
 }
 int GTExpr(int x, int y){
 //    auto fe = FrontEnd::instance();
