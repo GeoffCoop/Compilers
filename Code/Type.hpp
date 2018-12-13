@@ -13,21 +13,25 @@ class Type
 class IntType : public Type
 {
 	std::string name() {	return "int";		}
+	int size() { return 4; }
 };
 
 class BoolType : public Type
 {
 	std::string name() {	return "bool";		}
+	int size() { return 4;	}
 };
 
 class CharType : public Type
 {
 	std::string name() { 	return "char";		}
+	int size() { return 4; }
 };
 
 class StringType : public Type
 {
 	std::string name() {	return "string"; 	}
+	int size() { return 0; }
 };
 
 class RecordType : public Type
