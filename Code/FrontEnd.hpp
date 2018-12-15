@@ -54,4 +54,5 @@
 	int NewStatementSequence(int);
 	int StackStatementSequence(int, int);
 	
+	int stackIdentList(int, char*);	
 #endif

@@ -112,6 +112,7 @@ void yyerror(const char*);
 %type <int_val> Statement
 %type <int_val> StatementSequence
 
+%type <int_val> IdentList
 
 %%
 Program: ProgramHead Block DOT_SYMBOL{}
