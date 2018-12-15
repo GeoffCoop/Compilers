@@ -77,7 +77,7 @@ public:
     }
 
     void push_ST(){
-        symbolTable = std::make_shared<SymbolTable>(symbolTable);
+        symbolTable = std::make_shared<SymbolTable>(symbolTable, 0, 0);
     }
     void pop_ST(){
         symbolTable = symbolTable->getParent();
@@ -108,7 +108,7 @@ public:
     
 private:
     static std::shared_ptr<FrontEnd> fe;
-    std::shared_ptr<SymbolTable> symbolTable;
+    std::shared_ptr<SymbolTable> symbolTable = std::make_shared<SymbolTable>(nullptr,0,0);
     std::shared_ptr<StringTable> stringTable;
 };
 
@@ -309,14 +309,16 @@ int CallFunction(char* x, int y){
 int LValID(char* id){
     auto fe = FrontEnd::instance();
     auto symbol_ptr = fe->getSymbolTable()->findEntry(id);
+    auto r = 0;
     if (symbol_ptr != nullptr) {
-        auto r = reg.getRegister();
+        r = reg.getRegister();
         std::string out = "lw \t$t" + std::to_string(r); + ", " + std::to_string(symbol_ptr->getMemLoc());
     }
     else {
         //throw error about id not existing;
-        std::cout << "id " + std::string(id) + " doesn't exist.";
+        std::cout << "id " + std::string(id) + " doesn't exist." << std::endl;
     }
+    return r;
 }
 int LValMemberAccess(int base, char* ident){
 //    auto fe = FrontEnd::instance();
