@@ -488,3 +488,22 @@ int stackIdentList(int list, char* ident) {
         return list;
     }
 }
+
+char* lookupType(char* ident) { // pass type name through if it exists
+    auto fe = FrontEnd::instance();
+    if (fe->getSymbolTable()->findEntry(ident) == nullptr){
+        std::cout << "ERROR WITH TYPE " << std::string(ident) << ". Type non-existant." << std::endl;
+    }
+    return ident;
+}
+
+int addVar(int list, char* ident) {
+    auto fe = FrontEnd::instance();
+    auto vec = fe->identList.get(list);
+    auto type = fe->getSymbolTable()->findEntry(ident)->getType();
+    for (int i = 0; i < vec->size(); i++){
+        fe->getSymbolTable()->addEntry(vec->at(i), std::make_shared<VarSymbol>(type, 0));
+    }
+}
+
+#pragma endregion

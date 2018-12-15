@@ -113,6 +113,8 @@ void yyerror(const char*);
 %type <int_val> StatementSequence
 
 %type <int_val> IdentList
+%type <str_val> SimpleType
+%type <str_val> Type
 
 %%
 Program: ProgramHead Block DOT_SYMBOL{}
@@ -175,12 +177,12 @@ TypeDecls: TypeDecl
 TypeDecl: IDENT_SYMBOL EQUAL_SYMBOL Type SCOLON_SYMBOL
 	;
 
-Type: SimpleType
+Type: SimpleType { $$ = $1; }
 	| RecordType
 	| ArrayType
 	;
 
-SimpleType: IDENT_SYMBOL {}
+SimpleType: IDENT_SYMBOL { $$ = lookupType($1); }
 	;
 
 RecordType: RECORD_SYMBOL RecordDecls END_SYMBOL
@@ -208,7 +210,7 @@ VarDecls: VarDecl
 	| VarDecls VarDecl
 	;
 
-VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL {}
+VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL { addVar($1, $3); }
 	;
 
 StatementSequence: Statement 					{ $$ = NewStatementSequence($1); }
