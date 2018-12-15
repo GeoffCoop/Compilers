@@ -13,6 +13,7 @@
 #include "LValue.hpp"
 #include "ThreeAddressInstruction.hpp"
 #include "RegAllocation.hpp"
+#include "Type.hpp"
 
 #include "Expressions/stringExpression.hpp"
 #include "Expressions/intExpression.hpp"

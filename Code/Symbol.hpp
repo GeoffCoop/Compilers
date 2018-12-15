@@ -21,6 +21,7 @@ protected:
 };
 
 class VarSymbol: public Symbol {
+public:
 	VarSymbol(std::shared_ptr<Type> type, int memoryLocation)
 	{
 		m_type = type;
@@ -33,10 +34,11 @@ class ConstSymbol: public Symbol {
 };
 
 class TypeSymbol: public Symbol {
+public:
 	TypeSymbol(std::shared_ptr<Type> type, int memoryLocation){
 		m_type = type;
 		m_memoryLocation = memoryLocation;
 	}
-}
+};
 
 #endif

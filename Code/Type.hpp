@@ -2,6 +2,7 @@
 #define TYPE_HPP
 
 #include <string>
+#include <memory>
 
 class Type
 {
@@ -47,5 +48,6 @@ public:
 	static std::shared_ptr<Type> getBoolean() { return std::make_shared<BooleanType>(); };
 	static std::shared_ptr<Type> getChar() { return std::make_shared<CharType>(); };
 	static std::shared_ptr<Type> getString() { return std::make_shared<StringType>(); };
-}
+};
+
 #endif
