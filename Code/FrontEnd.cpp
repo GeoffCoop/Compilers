@@ -489,7 +489,7 @@ int stackIdentList(int list, char* ident) {
     }
 }
 
-char* lookupType(char* ident) { // pass type name through if it exists
+char* lookupType(char* ident) { // pass type name through if it exist
     auto fe = FrontEnd::instance();
     if (fe->getSymbolTable()->findEntry(ident) == nullptr){
         std::cout << "ERROR WITH TYPE " << std::string(ident) << ". Type non-existant." << std::endl;

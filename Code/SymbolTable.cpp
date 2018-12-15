@@ -14,4 +14,5 @@ std::shared_ptr<Symbol> SymbolTable::findEntry(std::string key){
         if (m_parent == nullptr) return nullptr;
         else return m_parent->findEntry(key);
     }
+    return m_symbols[key];
 }
