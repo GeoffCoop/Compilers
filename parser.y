@@ -195,8 +195,8 @@ RecordDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
 ArrayType: ARRAY_SYMBOL LBRACKET_SYMBOL Expression COLON_SYMBOL Expression RBRACKET_SYMBOL OF_SYMBOL Type
 	;
 
-IdentList: IDENT_SYMBOL
-	| IdentList COMMA_SYMBOL IDENT_SYMBOL
+IdentList: IDENT_SYMBOL						{ $$ = stackIdentList(-1, $1); }
+	| IdentList COMMA_SYMBOL IDENT_SYMBOL 	{ $$ = stackIdentList($1, $3); }
 	;
 
 OptVarDecls:
@@ -207,7 +207,7 @@ VarDecls: VarDecl
 	| VarDecls VarDecl
 	;
 
-VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
+VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL {}
 	;
 
 StatementSequence: Statement 					{ $$ = NewStatementSequence($1); }

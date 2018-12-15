@@ -110,6 +110,7 @@ public:
     NodeList<std::vector<std::shared_ptr<LValue>>> lValList;
     NodeList<std::vector<std::shared_ptr<Statement>>> slist;
     NodeList<ThreeAddressInstruction> instructions;
+    NodeList<std::vector<std::string>> identList;
     typedef NodeList<std::pair<
         std::shared_ptr<Expression>,
         std::vector<std::shared_ptr<Statement>>>>
@@ -472,3 +473,18 @@ int StackStatementSequence(int list, int stmt){
 }
 
 #pragma endregion
+
+#pragma region declarations
+int stackIdentList(int list, char* ident) {
+    auto fe = FrontEnd::instance();
+    if (list == -1) {
+        auto temp = std::make_shared<std::vector<std::string>>();
+        temp->push_back(ident);
+        return fe->identList.add(temp);
+    }
+    else {
+        auto vec = fe->identList.get(list);
+        vec->push_back(ident);
+        return list;
+    }
+}
