@@ -72,7 +72,21 @@ class FrontEnd
 {
 public:
     static std::shared_ptr<FrontEnd> instance(){
-        if (!fe) { fe = std::make_shared<FrontEnd>(); }
+        if (!fe) { 
+            fe = std::make_shared<FrontEnd>(); 
+            fe->getSymbolTable()->addEntry("integer", std::make_shared<TypeSymbol>(Type::getInt(), 0));
+            fe->getSymbolTable()->addEntry("INTEGER", std::make_shared<TypeSymbol>(Type::getInt(), 0));
+            fe->getSymbolTable()->addEntry("char", std::make_shared<TypeSymbol>(Type::getChar(), 0));
+            fe->getSymbolTable()->addEntry("CHAR", std::make_shared<TypeSymbol>(Type::getChar(), 0));
+            fe->getSymbolTable()->addEntry("boolean", std::make_shared<TypeSymbol>(Type::getBoolean(), 0));
+            fe->getSymbolTable()->addEntry("BOOLEAN", std::make_shared<TypeSymbol>(Type::getBoolean(), 0));
+            fe->getSymbolTable()->addEntry("string", std::make_shared<TypeSymbol>(Type::getString(), 0));
+            fe->getSymbolTable()->addEntry("STRING", std::make_shared<TypeSymbol>(Type::getString(), 0));
+            fe->getSymbolTable()->addEntry("true", std::make_shared<TypeSymbol>(Type::getBoolean(), 0));
+            fe->getSymbolTable()->addEntry("TRUE", std::make_shared<TypeSymbol>(Type::getBoolean(), 0));
+            fe->getSymbolTable()->addEntry("false", std::make_shared<TypeSymbol>(Type::getBoolean(), 0));
+            fe->getSymbolTable()->addEntry("FALSE", std::make_shared<TypeSymbol>(Type::getBoolean(), 0));
+        }
 	return fe;
     }
 
