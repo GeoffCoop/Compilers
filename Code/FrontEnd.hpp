@@ -4,6 +4,7 @@
 #include <string>
 
 	std::string initMIPS();
+	void emitMIPS();
 	
 	int StringExpr(char* x);
 	int IntExpr(int x);
