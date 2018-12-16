@@ -101,6 +101,10 @@ public:
     std::shared_ptr<SymbolTable> getSymbolTable()   {
         return symbolTable;
     }
+
+    void addCode(std::string newCode){
+        code += newCode;
+    }
     
     //some list of expressions
     NodeList<Expression> expressions;
@@ -126,6 +130,7 @@ private:
     static std::shared_ptr<FrontEnd> fe;
     std::shared_ptr<SymbolTable> symbolTable = std::make_shared<SymbolTable>(nullptr,0,0);
     std::shared_ptr<StringTable> stringTable;
+    std::string code = "";
 };
 
 std::shared_ptr<FrontEnd> FrontEnd::fe;
@@ -138,27 +143,36 @@ std::string initMIPS() {
     s += "main:\n";
     return s;
 }
+
+std::string emitMips() {
+    std::string out;
+    out = initMIPS();
+
+}
 #pragma region Expressions
 int StringExpr(char* x){
     auto st = StringTable::instance();
     int i = st->addString(std::string(x)); 
     int r = reg.getRegister();
     std::string out = "li \t$t"+ std::to_string(r) + std::string(", st") + std::to_string(i);
-    std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
+    // std::cout << out << std::endl;
     return r;
 }
 int IntExpr(int x){
     auto fe = FrontEnd::instance();
     int r = reg.getRegister();
     std::string out = "li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int CharExpr(char x){
     auto fe = FrontEnd::instance();
     int r = reg.getRegister();
     std::string out = "li \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 // The following need to retrieve other expressions first
@@ -166,12 +180,14 @@ int SuccExpr(int x){
     int r = reg.getRegister();
     std::string out = "addi \t$t" + std::to_string(r) + ", $" + std::to_string(x) + ", 1";
     reg.release(x);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int PredExpr(int x){
     int r = reg.getRegister();
     std::string out = "addi \t$t" + std::to_string(r) + ", $" + std::to_string(x) + ", -1";
+    FrontEnd::instance()->addCode(out);
 }
 int ChrExpr(int x){
 //    auto fe = FrontEnd::instance();
@@ -187,14 +203,16 @@ int UMinusExpr(int x){
     int r = reg.getRegister();
     std::string out = "sub \t$t" + std::to_string(r) + ", $0" + std::to_string(x);
     reg.release(x);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int NotExpr(int x){
     int r = reg.getRegister();
     std::string out = "not \t$t" + std::to_string(r) + ", $t" + std::to_string(x);
     reg.release(x);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 //////////////////////////////// Need to grab both expressions from list
@@ -204,8 +222,10 @@ int ModExpr(int x, int y){
     std::string out2 ="mfhi \t$t" + std::to_string(r);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
-    std::cout << out2 << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
+    // std::cout << out2 << std::endl;
+    FrontEnd::instance()->addCode(out2);
     return r;
 }
 int DivExpr(int x, int y){
@@ -214,8 +234,10 @@ int DivExpr(int x, int y){
     std::string out2 = "mflo \t$t" + std::to_string(r);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
-    std::cout << out2 << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
+    // std::cout << out2 << std::endl;
+    FrontEnd::instance()->addCode(out2);
     return r;
 }
 int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
@@ -224,8 +246,10 @@ int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
     std::string out2 = "mflo \t$t" + std::to_string(r);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
-    std::cout << out2 << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
+    // std::cout << out2 << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int MinExpr(int x, int y){
@@ -234,7 +258,8 @@ int MinExpr(int x, int y){
     std::string out = "sub \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out <<std::endl;
+    // std::cout << out <<std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int GTExpr(int x, int y){
@@ -242,7 +267,8 @@ int GTExpr(int x, int y){
     std::string out = "sgt \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int PlusExpr(int x, int y){
@@ -250,7 +276,8 @@ int PlusExpr(int x, int y){
     std::string out = "add \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int LTExpr(int x, int y){
@@ -258,7 +285,8 @@ int LTExpr(int x, int y){
     std::string out = "slt \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int GTEExpr(int x, int y){
@@ -266,7 +294,8 @@ int GTEExpr(int x, int y){
     std::string out = "sge \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int LTEExpr(int x, int y){
@@ -274,7 +303,8 @@ int LTEExpr(int x, int y){
     std::string out = "sle \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int NEExpr(int x, int y){
@@ -282,7 +312,8 @@ int NEExpr(int x, int y){
     std::string out = "sne \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int EQExpr(int x, int y){
@@ -290,7 +321,8 @@ int EQExpr(int x, int y){
     std::string out = "seq \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl; 
+    // std::cout << out << std::endl; 
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int AndExpr(int x, int y){
@@ -298,7 +330,8 @@ int AndExpr(int x, int y){
     std::string out = "and \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int OrExpr(int x, int y){
@@ -306,7 +339,8 @@ int OrExpr(int x, int y){
     std::string out = "or \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y);
     reg.release(x);
     reg.release(y);
-    std::cout << out << std::endl;
+    // std::cout << out << std::endl;
+    FrontEnd::instance()->addCode(out);
     return r;
 }
 int LValueExpr(int x){
@@ -329,6 +363,7 @@ int LValID(char* id){
     if (symbol_ptr != nullptr) {
         r = reg.getRegister();
         std::string out = "lw \t$t" + std::to_string(r); + ", " + std::to_string(symbol_ptr->getMemLoc());
+        FrontEnd::instance()->addCode(out);
     }
     else {
         //throw error about id not existing;
