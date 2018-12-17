@@ -7,7 +7,7 @@
 class Type
 {
 	//Types of Symbol  int bool char string 
-private:
+public:
 	virtual std::string name() = 0;	
 	virtual int size() = 0;
 };

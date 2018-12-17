@@ -92,7 +92,7 @@ public:
     }
 
     void push_ST(){
-        symbolTable = std::make_shared<SymbolTable>(symbolTable, 0, 0);
+        symbolTable = std::make_shared<SymbolTable>(symbolTable, symbolTable->getLoc());
     }
     void pop_ST(){
         symbolTable = symbolTable->getParent();
@@ -542,9 +542,10 @@ char* lookupType(char* ident) { // pass type name through if it exist
 int addVar(int list, char* ident) {
     auto fe = FrontEnd::instance();
     auto vec = fe->identList.get(list);
-    auto type = fe->getSymbolTable()->findEntry(ident)->getType();
+    auto st = fe->getSymbolTable();
+    auto type = st->findEntry(ident)->getType();
     for (int i = 0; i < vec->size(); i++){
-        fe->getSymbolTable()->addEntry(vec->at(i), std::make_shared<VarSymbol>(type, 0));
+        st->addEntry(vec->at(i), std::make_shared<VarSymbol>(type, st->getOffset()));
     }
 }
 
