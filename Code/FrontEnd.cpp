@@ -132,7 +132,7 @@ public:
     
 private:
     static std::shared_ptr<FrontEnd> fe;
-    std::shared_ptr<SymbolTable> symbolTable = std::make_shared<SymbolTable>(nullptr,0,0);
+    std::shared_ptr<SymbolTable> symbolTable = std::make_shared<SymbolTable>(nullptr,0);
     std::shared_ptr<StringTable> stringTable;
     std::string code = "";
 };
@@ -148,7 +148,7 @@ std::string initMIPS() {
     return s;
 }
 
-void emitMips() {
+void emitMIPS() {
     std::string out;
     out = initMIPS();
     out += FrontEnd::instance()->getCode();
@@ -369,7 +369,7 @@ int LValID(char* id){
     auto r = 0;
     if (symbol_ptr != nullptr) {
         r = reg.getRegister();
-        std::string out = "lw \t$t" + std::to_string(r); + ", " + std::to_string(symbol_ptr->getMemLoc()) + "\n";
+        std::string out = "lw \t$t" + std::to_string(r) + ", " + std::to_string(symbol_ptr->getMemLoc()) + "\n";
         FrontEnd::instance()->addCode(out);
     }
     else {

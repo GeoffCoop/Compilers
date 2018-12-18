@@ -117,7 +117,7 @@ void yyerror(const char*);
 %type <str_val> Type
 
 %%
-Program: ProgramHead Block DOT_SYMBOL{}
+Program: ProgramHead Block DOT_SYMBOL{ emitMIPS(); }
 	;
 
 ProgramHead: OptConstDecl OptTypeDecl OptVarDecls PFDecl
