@@ -441,10 +441,9 @@ int StackArguments(int list, int expr){
 
 #pragma region statements
 int AssignStmt(int lval, int expr){
-//    auto fe = FrontEnd::instance();
-//    auto lv = fe->lValues.get(lval);
-//    auto e = fe-> expressions.get(expr);
-//    return fe->statements.add(std::make_shared<AssignStatement>(lv, e));
+    auto r = reg.getRegister();
+    std::string out = "\tli \t$t" + std::to_string(r) + ", " + std::to_string(lval) + "\n";
+    out += "\tsw \t$t" + std::to_str(expr) + "0($t" + std::to_string(r) + ")\n";
 }
 int MergeConditional(int expr, int stmts){
 //    auto fe = FrontEnd::instance();
