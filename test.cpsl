@@ -1,5 +1,5 @@
-var a : integer; b : boolean;
-
+var
+  a : integer; b : boolean; 
 begin
 	a := 1+7;
 	a := 3-1;

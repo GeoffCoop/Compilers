@@ -110,9 +110,6 @@ public:
         return code;
     }
 
-    std::shared_ptr<StringTable> getStringTable() {
-        return stringTable;
-    }
     
     //some list of expressions
     NodeList<Expression> expressions;
@@ -145,11 +142,15 @@ std::shared_ptr<FrontEnd> FrontEnd::fe;
 RegAlloc reg;
 
 std::string printStringTable(){
-    auto st = FrontEnd::instance()->getStringTable()->getTable();
+    auto st = StringTable::instance()->getTable();
+    	std::cout << "got ST fine" << std::endl;
     std::string out = "";
-    for (auto &e: st){
-        out += "STR" + std::to_string(e.second) + ": \t .asciiz" + std::string(e.first) + "\n";
+    if (st.size() > 0)
+    for (auto e: st){
+        out += "STR" + std::to_string(e.second) + ": \t .asciizi " + std::string(e.first) + "\n";
     }
+	std::cout << out << std::endl;
+    return out;
 }
 
 std::string initMIPS() {
@@ -157,7 +158,7 @@ std::string initMIPS() {
     s += "\t.globl main\n";
     s += "main:\n";
     s += "\tla \t$gp, GA\n";
-    s += "\taddi \t$fp, $sp, 0\n";  
+    s += "\taddi \t$fp, $sp, 0\n\n";  
     return s;
 }
 
@@ -168,7 +169,6 @@ void emitMIPS() {
     out += FrontEnd::instance()->getCode();
     // what to do with this?
     out += "li \t$v0, 10\nsyscall\n";
-
     out += ".data\n";
     out += printStringTable();
     out += "GA:\n";
@@ -277,7 +277,7 @@ int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     // std::cout << out2 << std::endl;
-    FrontEnd::instance()->addCode(out);
+    FrontEnd::instance()->addCode(out2);
     return r;
 }
 int MinExpr(int x, int y){
@@ -390,7 +390,8 @@ int LValID(char* id){
     auto r = 0;
     if (symbol_ptr != nullptr) {
         r = reg.getRegister();
-        std::string out = "lw \t$t" + std::to_string(r) + ", " + std::to_string(symbol_ptr->getMemLoc()) + "\n";
+	std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(symbol_ptr->getMemLoc()) + "\n";
+        out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
         FrontEnd::instance()->addCode(out);
     }
     else {
