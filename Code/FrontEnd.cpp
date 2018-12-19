@@ -374,7 +374,10 @@ int OrExpr(int x, int y){
 int LValueExpr(int x){
     auto fe = FrontEnd::instance();
     auto r = reg.getRegister();
-    std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(x) + "\n";
+    auto lval = fe->lValues.get(x);
+    //if lValID
+    auto off = fe->getSymbolTable()->findEntry(lval->id)->getMemLoc();
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "\n";
     out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
     fe->addCode(out);
 }
