@@ -1,4 +1,5 @@
-
+#include <string>
+#include <iostream>
 #include "SymbolTable.hpp"
 
 void SymbolTable::addEntry (std::string key, std::shared_ptr<Symbol> symbol){
@@ -6,7 +7,8 @@ void SymbolTable::addEntry (std::string key, std::shared_ptr<Symbol> symbol){
     if (found == m_symbols.end()){
         m_symbols[key] = symbol;
     }
-    if(typeid(symbol) == typeid(findEntry("integer")))
+	std::cout << (typeid(symbol) == typeid(findEntry("integer"))) << std::endl;
+    if(typeid(symbol) != typeid(findEntry("integer")))
         memoryOffset += symbol->getType()->size();
 }
 
