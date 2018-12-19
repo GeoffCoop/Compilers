@@ -109,6 +109,10 @@ public:
     std::string getCode() {
         return code;
     }
+
+    std::shared_ptr<StringTable> getStringTable() {
+        return stringTable;
+    }
     
     //some list of expressions
     NodeList<Expression> expressions;
@@ -140,19 +144,36 @@ private:
 std::shared_ptr<FrontEnd> FrontEnd::fe;
 RegAlloc reg;
 
+std::string printStringTable(){
+    auto st = FrontEnd::instance()->getStringTable()->getTable();
+    std::string out = "";
+    for (auto &e: st){
+        out += "STR" + std::to_string(e.second) + ": \t .asciiz" + std::string(e.first) + "\n";
+    }
+}
+
 std::string initMIPS() {
-    std::string s =  "\t.data\n";
+    std::string s = "\t.text\n";
     s += "\t.globl main\n";
-    s += "\t.text\n";
     s += "main:\n";
+    s += "\tla \t$gp, GA\n";
+    s += "\taddi \t$fp, $sp, 0\n";  
     return s;
 }
 
 void emitMIPS() {
     std::string out;
     out = initMIPS();
+    //blocks go here
     out += FrontEnd::instance()->getCode();
-    out += "li \t$v0, 10\nsyscall";
+    // what to do with this?
+    out += "li \t$v0, 10\nsyscall\n";
+
+    out += ".data\n";
+    out += printStringTable();
+    out += "GA:\n";
+
+
     std::cout << out << std::endl;
 }
 

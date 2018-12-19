@@ -3,6 +3,7 @@
 
 #include <string>
 
+	std::string printStringTable();
 	std::string initMIPS();
 	void emitMIPS();
 	
