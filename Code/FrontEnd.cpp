@@ -157,7 +157,8 @@ std::string initMIPS() {
     s += "\t.globl main\n";
     s += "main:\n";
     s += "\tla \t$gp, GA\n";
-    s += "\taddi \t$fp, $sp, 0\n\n";  
+    s += "\taddi \t$fp, $sp, 0\n\n"; 
+    s += "BB1:\n"; 
     return s;
 }
 
@@ -167,7 +168,7 @@ void emitMIPS() {
     //blocks go here
     out += FrontEnd::instance()->getCode();
     // what to do with this?
-    out += "li \t$v0, 10\nsyscall\n";
+    out += "\tli \t$v0, 10\n\tsyscall\n";
     out += ".data\n";
     out += printStringTable();
     out += "GA:\n";
@@ -440,9 +441,11 @@ int StackArguments(int list, int expr){
 
 #pragma region statements
 int AssignStmt(int lval, int expr){
+    auto fe = FrontEnd::instance();
     auto r = reg.getRegister();
-    std::string out = "\tli \t$t" + std::to_string(r) + ", " + std::to_string(lval) + "\n";
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(lval) + "\n";
     out += "\tsw \t$t" + std::to_string(expr) + ", 0($t" + std::to_string(r) + ")\n";
+    fe->addCode(out);
 }
 int MergeConditional(int expr, int stmts){
 //    auto fe = FrontEnd::instance();
