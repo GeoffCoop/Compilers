@@ -6,7 +6,7 @@ void SymbolTable::addEntry (std::string key, std::shared_ptr<Symbol> symbol){
     if (found == m_symbols.end()){
         m_symbols[key] = symbol;
     }
-    if (symbol->getMemLoc() != -1)
+    // if (symbol->getMemLoc() != -1)
         memoryOffset += symbol->getType()->size();
 }
 

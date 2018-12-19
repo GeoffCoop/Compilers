@@ -28,7 +28,7 @@
 #include "Expressions/gte.hpp"
 #include "Expressions/lt.hpp"
 #include "Expressions/lte.hpp"
-#include "Expressions/lvalueexpr.hpp"
+// #include "Expressions/lvalueexpr.hpp"
 #include "Expressions/mod.hpp"
 #include "Expressions/mult.hpp"
 #include "Expressions/ne.hpp"
@@ -390,14 +390,15 @@ int CallFunction(char* x, int y){
 int LValID(char* id){
     auto fe = FrontEnd::instance();
     auto symbol_ptr = fe->getSymbolTable()->findEntry(id);
+    int i = -1;
     if (symbol_ptr != nullptr) {
-        return symbol_ptr->getMemLoc();
+        i = fe->lValues.add(std::make_shared<IDLValue>(id));
     }
     else {
         //throw error about id not existing;
         std::cout << "id " + std::string(id) + " doesn't exist." << std::endl;
     }
-    return -1;
+    return i;
 }
 int LValMemberAccess(int base, char* ident){
 //    auto fe = FrontEnd::instance();
@@ -442,8 +443,10 @@ int StackArguments(int list, int expr){
 #pragma region statements
 int AssignStmt(int lval, int expr){
     auto fe = FrontEnd::instance();
+    auto l = fe->lValues.get(lval);
     auto r = reg.getRegister();
-    std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(lval) + "\n";
+    auto sym = fe->getSymbolTable()->findEntry(l->id);
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(sym->getMemLoc()) + "\n";
     out += "\tsw \t$t" + std::to_string(expr) + ", 0($t" + std::to_string(r) + ")\n";
     fe->addCode(out);
 }

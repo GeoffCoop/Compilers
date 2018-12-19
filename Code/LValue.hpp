@@ -6,12 +6,21 @@
 
 class LValue
 {
-    
+public:
+    std::string id;
+    int base;
+    int expr;
 };
 
 class IDLValue : public LValue
 {
-    IDLValue(char* ident);
+public:
+    IDLValue(char* ident) {
+        id = ident;
+    }
+
+private:
+    
 };
 
 class MemberLValue : public LValue
