@@ -75,18 +75,18 @@ public:
     static std::shared_ptr<FrontEnd> instance(){
         if (!fe) { 
             fe = std::make_shared<FrontEnd>(); 
-            fe->getSymbolTable()->addEntry("integer", std::make_shared<TypeSymbol>(BuiltInType::getInt(), 0));
-            fe->getSymbolTable()->addEntry("INTEGER", std::make_shared<TypeSymbol>(BuiltInType::getInt(), 0));
-            fe->getSymbolTable()->addEntry("char", std::make_shared<TypeSymbol>(BuiltInType::getChar(), 0));
-            fe->getSymbolTable()->addEntry("CHAR", std::make_shared<TypeSymbol>(BuiltInType::getChar(), 0));
-            fe->getSymbolTable()->addEntry("boolean", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), 0));
-            fe->getSymbolTable()->addEntry("BOOLEAN", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), 0));
-            fe->getSymbolTable()->addEntry("string", std::make_shared<TypeSymbol>(BuiltInType::getString(), 0));
-            fe->getSymbolTable()->addEntry("STRING", std::make_shared<TypeSymbol>(BuiltInType::getString(), 0));
-            fe->getSymbolTable()->addEntry("true", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), 0));
-            fe->getSymbolTable()->addEntry("TRUE", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), 0));
-            fe->getSymbolTable()->addEntry("false", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), 0));
-            fe->getSymbolTable()->addEntry("FALSE", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), 0));
+            fe->getSymbolTable()->addEntry("integer", std::make_shared<TypeSymbol>(BuiltInType::getInt(), -1));
+            fe->getSymbolTable()->addEntry("INTEGER", std::make_shared<TypeSymbol>(BuiltInType::getInt(), -1));
+            fe->getSymbolTable()->addEntry("char", std::make_shared<TypeSymbol>(BuiltInType::getChar(), -1));
+            fe->getSymbolTable()->addEntry("CHAR", std::make_shared<TypeSymbol>(BuiltInType::getChar(), -1));
+            fe->getSymbolTable()->addEntry("boolean", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), -1));
+            fe->getSymbolTable()->addEntry("BOOLEAN", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), -1));
+            fe->getSymbolTable()->addEntry("string", std::make_shared<TypeSymbol>(BuiltInType::getString(), -1));
+            fe->getSymbolTable()->addEntry("STRING", std::make_shared<TypeSymbol>(BuiltInType::getString(), -1));
+            fe->getSymbolTable()->addEntry("true", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), -1));
+            fe->getSymbolTable()->addEntry("TRUE", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), -1));
+            fe->getSymbolTable()->addEntry("false", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), -1));
+            fe->getSymbolTable()->addEntry("FALSE", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), -1));
         }
 	return fe;
     }
@@ -372,8 +372,11 @@ int OrExpr(int x, int y){
     return r;
 }
 int LValueExpr(int x){
+    auto fe = FrontEnd::instance();
     auto r = reg.getRegister();
-    // symbolTable->findEntry
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(x) + "\n";
+    out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
+    fe->addCode(out);
 }
 
 int CallFunction(char* x, int y){
@@ -387,18 +390,14 @@ int CallFunction(char* x, int y){
 int LValID(char* id){
     auto fe = FrontEnd::instance();
     auto symbol_ptr = fe->getSymbolTable()->findEntry(id);
-    auto r = 0;
     if (symbol_ptr != nullptr) {
-        r = reg.getRegister();
-	std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(symbol_ptr->getMemLoc()) + "\n";
-        out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
-        FrontEnd::instance()->addCode(out);
+        return symbol_ptr->getMemLoc();
     }
     else {
         //throw error about id not existing;
         std::cout << "id " + std::string(id) + " doesn't exist." << std::endl;
     }
-    return r;
+    return -1;
 }
 int LValMemberAccess(int base, char* ident){
 //    auto fe = FrontEnd::instance();
