@@ -272,7 +272,7 @@ LValues: LValues COMMA_SYMBOL LValue	{ $$ = StackLVal($1, $3); 	}
 	| LValue							{ $$ = NewLValList($1); }
 	;
 
-WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStatement($3); }
+WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStmt($3); }
 	;
 
 WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ $$ = StackWriteArgs($1, $3); }
