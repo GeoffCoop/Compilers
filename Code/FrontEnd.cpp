@@ -114,6 +114,7 @@ public:
     //some list of expressions
     NodeList<Expression> expressions;
     NodeList<LValue> lValues;
+    NodeList<std::vector<int>> writeArgs;
     NodeList<std::vector<std::shared_ptr<Expression>>> arguments;
     NodeList<Statement> statements;
     NodeList<std::vector<std::shared_ptr<LValue>>> lValList;
@@ -179,28 +180,35 @@ void emitMIPS() {
 
 #pragma region Expressions
 int StringExpr(char* x){
+    auto fe = FrontEnd::instance();
     auto st = StringTable::instance();
     int i = st->addString(std::string(x)); 
     int r = reg.getRegister();
+    auto exp = std::make_shared<Expression>(BuiltInType::getString(), r);
     std::string out = "\tli \t$t"+ std::to_string(r) + std::string(", st") + std::to_string(i) + "\n";
     FrontEnd::instance()->addCode(out);
+    auto l = fe->expressions.add(exp);
     // std::cout << out << std::endl;
-    return r;
+    return l;
 }
 int IntExpr(int x){
     auto fe = FrontEnd::instance();
     int r = reg.getRegister();
+    auto exp = std::make_shared<Expression>(BuiltInType::getInt(), r);
     std::string out = "\tli \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x) + "\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
+    auto l = fe->expressions.add(exp);
     return r;
 }
 int CharExpr(char x){
     auto fe = FrontEnd::instance();
     int r = reg.getRegister();
+    auto exp = std::make_shared<Expression>(BuiltInType::getChar(), r);
     std::string out = "\tli \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x) + "\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
+    auto l = fe->expressions.add(exp);
     return r;
 }
 // The following need to retrieve other expressions first
@@ -375,6 +383,7 @@ int LValueExpr(int x){
     auto fe = FrontEnd::instance();
     auto r = reg.getRegister();
     auto lval = fe->lValues.get(x);
+
     //if lValID
     auto off = fe->getSymbolTable()->findEntry(lval->id)->getMemLoc();
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "\n";
@@ -525,9 +534,37 @@ int ReadStmt(int lvals){
 //    return fe->statements.add(std::make_shared<ReadStatement>(fe->lValList.get(lvals)));
 }
 int WriteStmt(int argList){
-//    auto fe = FrontEnd::instance();
-//    return fe->statements.add(std::make_shared<WriteStatement>(fe->arguments.get(argList)));
+
+    // deduce type
+    // if int
+        //$v0 = 1
+        //$a0 = val
+    // if char
+        //$v0 = 4   try syscall 11, but prolly char to string
+        //$a0 = char to string
+    // if string
+        //$v0 = 4   
+        //$a0 = str
+    // if bool
+        //$v0 = 1
+        //$a0 = val
+    // set $v0 to type
+    //set $a0 to value
+    //syscall
 }
+
+int StackWriteArgs(int list, int reg) {
+    auto fe = FrontEnd::instance();
+    if(list == -1){
+        auto vec = std::make_shared<std::vector<int>>();
+        vec->push_back(reg);
+        return fe->writeArgs.add(vec);
+    }
+    else {
+        fe->writeArgs.get(list)->push_back(reg);
+        return list;
+    }
+};
 int ProcCall(char* id, int argList){}
 int NewStatementSequence(int stmt){
  //   auto fe = FrontEnd::instance();

@@ -52,6 +52,7 @@
 	int ReturnStmt(int);
 	int ReadStmt(int);
 	int WriteStmt(int);
+	int StackWriteArgs(int, int);
 	int ProcCall(char*, int);
 	int NewStatementSequence(int);
 	int StackStatementSequence(int, int);
