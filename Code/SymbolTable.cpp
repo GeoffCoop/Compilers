@@ -8,7 +8,7 @@ void SymbolTable::addEntry (std::string key, std::shared_ptr<Symbol> symbol){
         m_symbols[key] = symbol;
     }
 	std::cout << (typeid(symbol) == typeid(findEntry("integer"))) << std::endl;
-    if(typeid(symbol) != typeid(findEntry("integer")))
+//    if(typeid(symbol) != typeid(findEntry("integer")))
         memoryOffset += symbol->getType()->size();
 }
 
