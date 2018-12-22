@@ -9,7 +9,7 @@ public:
 
     int getRegister(){
         static int num = 0;
-        while (reg[num] != 0) { // potential infinite loop for full registers.
+        while (reg[num] != 0) { // potential infinite loop for full registers. I guess if all full, return -1?
             num++ % NUM_REG;
         }
         return num++ % NUM_REG;

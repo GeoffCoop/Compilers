@@ -593,13 +593,32 @@ int WriteStmt(int argList){
     auto fe = FrontEnd::instance();
     auto list = fe->writeArgs.get(argList);
     for (int i = 0; i < list->size(); i++){ // for each in list
-        auto type = fe->expressions.get(list->at(i))->type;
+        auto exp = fe->expressions.get(list->at(i));
+        auto type = exp->type;
+        auto r = exp->r;
         std::string out = "";
-        if (type->name() == "int") {  }
-        else if (type->name() == "char") {}
-        else if (type->name() == "string") {}
-        else if (type->name() == "bool") {}
+        if (type->name() == "int") { 
+            out += "\tli \t$v0, 1\n";
+            out += "\tlw \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tsyscall\n";
+         }
+        else if (type->name() == "char") {
+            out += "\tli \t$v0, 11\n";
+            out += "\tlw \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tsyscall\n";
+        }
+        else if (type->name() == "string") {
+            // out += "\tli \t$v0, 1\n";
+            // out += "\tlw \t$a0, $t" + std::to_string() + "\n";
+            // out += "\tsyscall\n";
+        }
+        else if (type->name() == "bool") {
+            out += "\tli \t$v0, 1\n";
+            out += "\tlw \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tsyscall\n";
+        }
         else {} // non-printable type
+        fe->addCode(out);
     }
     // deduce type
     // if int
