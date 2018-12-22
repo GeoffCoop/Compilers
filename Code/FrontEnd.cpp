@@ -149,7 +149,6 @@ std::string printStringTable(){
     for (auto e: st){
         out += "STR" + std::to_string(e.second) + ": \t .asciizi " + std::string(e.first) + "\n";
     }
-	std::cout << out << std::endl;
     return out;
 }
 
@@ -199,7 +198,7 @@ int IntExpr(int x){
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     auto l = fe->expressions.add(exp);
-    return r;
+    return l;
 }
 int CharExpr(char x){
     auto fe = FrontEnd::instance();
@@ -307,7 +306,6 @@ int MinExpr(int x, int y){
     int r = reg.getRegister();
     int xr = fe->expressions.get(x)->r;
     int yr = fe->expressions.get(y)->r;
-	x = 1; //TEMP SO IT WORKS ON HANOI FOR NOW
     std::string out = "\tsub \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
     reg.release(xr);
     reg.release(yr);
@@ -601,7 +599,7 @@ int WriteStmt(int argList){
         else if (type->name() == "char") {}
         else if (type->name() == "string") {}
         else if (type->name() == "bool") {}
-        else // non-printable type
+        else {} // non-printable type
     }
     // deduce type
     // if int
