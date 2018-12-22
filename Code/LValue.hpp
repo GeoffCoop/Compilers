@@ -3,6 +3,7 @@
 
 #include <string>
 #include "Expressions/Expression.hpp"
+#include "Type.hpp"
 
 class LValue
 {
@@ -10,6 +11,7 @@ public:
     std::string id;
     int base;
     int expr;
+    std::shared_ptr<Type> type;
 };
 
 class IDLValue : public LValue

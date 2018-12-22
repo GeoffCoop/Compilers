@@ -213,17 +213,19 @@ int CharExpr(char x){
 }
 // The following need to retrieve other expressions first
 int SuccExpr(int x){
-    int r = reg.getRegister();
-    std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(x) + ", 1\n";
-    reg.release(x);
+    auto fe = FrontEnd::instance();
+    int r = fe->expressions.get(x)->r;
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(r) + ", 1\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return x;
 }
 int PredExpr(int x){
-    int r = reg.getRegister();
-    std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(x) + ", -1\n";
+    auto fe = FrontEnd::instance();
+    int r = fe->expressions.get(x)->r;
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(r) + ", -1\n";
     FrontEnd::instance()->addCode(out);
+    return x;
 }
 int ChrExpr(int x){
 //    auto fe = FrontEnd::instance();
@@ -236,148 +238,201 @@ int OrdExpr(int x){
 //    return fe->expressions.add(std::make_shared<Ord>(exp));
 }
 int UMinusExpr(int x){
-    int r = reg.getRegister();
-    std::string out = "\tsub \t$t" + std::to_string(r) + ", $0" + std::to_string(x) + "\n";
-    reg.release(x);
+    auto fe = FrontEnd::instance();
+    int r = fe->expressions.get(x)->r;
+    std::string out = "\tsub \t$t" + std::to_string(r) + ", $0, $t" + std::to_string(r) + "\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return x;
 }
 int NotExpr(int x){
-    int r = reg.getRegister();
-    std::string out = "\tnot \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + "\n";
-    reg.release(x);
+    int r = FrontEnd::instance()->expressions.get(x)->r;
+    std::string out = "\tnot \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + "\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return x;
 }
 //////////////////////////////// Need to grab both expressions from list
 int ModExpr(int x, int y){
+    auto fe = FrontEnd::instance();
     int r = reg.getRegister();
-    std::string out = "\tdiv \t$t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
+    //check type?
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tdiv \t$t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
     std::string out2 ="\tmfhi \t$t" + std::to_string(r) + "\n";
-    reg.release(x);
-    reg.release(y);
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     // std::cout << out2 << std::endl;
     FrontEnd::instance()->addCode(out2);
-    return r;
+    return z;
 }
 int DivExpr(int x, int y){
+    auto fe = FrontEnd::instance();
     int r = reg.getRegister();
-    std::string out = "\tdiv \t$t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tdiv \t$t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
     std::string out2 = "\tmflo \t$t" + std::to_string(r) + "\n";
-    reg.release(x);
-    reg.release(y);
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     // std::cout << out2 << std::endl;
     FrontEnd::instance()->addCode(out2);
-    return r;
+    return z;
 }
 int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
+    auto fe = FrontEnd::instance();
     int r = reg.getRegister();
-    std::string out = "\tmult \t$t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tmult \t$t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
     std::string out2 = "\tmflo \t$t" + std::to_string(r) + "\n";
-    reg.release(x);
-    reg.release(y);
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     // std::cout << out2 << std::endl;
     FrontEnd::instance()->addCode(out2);
-    return r;
+    return z;
 }
 int MinExpr(int x, int y){
-    auto r = reg.getRegister();
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
 	x = 1; //TEMP SO IT WORKS ON HANOI FOR NOW
-    std::string out = "\tsub \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    std::string out = "\tsub \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
     // std::cout << out <<std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
+
 int GTExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tsgt \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tsgt \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int PlusExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tadd \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tadd \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int LTExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tslt \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tslt \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int GTEExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tsge \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tsge \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int LTEExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tsle \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tsle \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int NEExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tsne \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tsne \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int EQExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tseq \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tseq \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl; 
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int AndExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tand \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tand \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int OrExpr(int x, int y){
-    auto r = reg.getRegister();
-    std::string out = "\tor \t$t" + std::to_string(r) + ", $t" + std::to_string(x) + ", $t" + std::to_string(y) + "\n";
-    reg.release(x);
-    reg.release(y);
+    auto fe = FrontEnd::instance();
+    int r = reg.getRegister();
+    int xr = fe->expressions.get(x)->r;
+    int yr = fe->expressions.get(y)->r;
+    std::string out = "\tor \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
+    reg.release(xr);
+    reg.release(yr);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    return r;
+    return z;
 }
 int LValueExpr(int x){
     auto fe = FrontEnd::instance();
@@ -389,6 +444,8 @@ int LValueExpr(int x){
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "\n";
     out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
     fe->addCode(out);
+    auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r));
+    return z;
 }
 
 int CallFunction(char* x, int y){
@@ -457,9 +514,10 @@ int AssignStmt(int lval, int expr){
     auto fe = FrontEnd::instance();
     auto l = fe->lValues.get(lval);
     auto r = reg.getRegister();
+    auto e = fe->expressions.get(expr);
     auto sym = fe->getSymbolTable()->findEntry(l->id);
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(sym->getMemLoc()) + "\n";
-    out += "\tsw \t$t" + std::to_string(expr) + ", 0($t" + std::to_string(r) + ")\n";
+    out += "\tsw \t$t" + std::to_string(e->r) + ", 0($t" + std::to_string(r) + ")\n";
     fe->addCode(out);
 }
 int MergeConditional(int expr, int stmts){
@@ -534,7 +592,17 @@ int ReadStmt(int lvals){
 //    return fe->statements.add(std::make_shared<ReadStatement>(fe->lValList.get(lvals)));
 }
 int WriteStmt(int argList){
-
+    auto fe = FrontEnd::instance();
+    auto list = fe->writeArgs.get(argList);
+    for (int i = 0; i < list->size(); i++){ // for each in list
+        auto type = fe->expressions.get(list->at(i))->type;
+        std::string out = "";
+        if (type->name() == "int") {  }
+        else if (type->name() == "char") {}
+        else if (type->name() == "string") {}
+        else if (type->name() == "bool") {}
+        else // non-printable type
+    }
     // deduce type
     // if int
         //$v0 = 1
@@ -553,15 +621,15 @@ int WriteStmt(int argList){
     //syscall
 }
 
-int StackWriteArgs(int list, int reg) {
+int StackWriteArgs(int list, int exp) {
     auto fe = FrontEnd::instance();
     if(list == -1){
         auto vec = std::make_shared<std::vector<int>>();
-        vec->push_back(reg);
+        vec->push_back(exp);
         return fe->writeArgs.add(vec);
     }
     else {
-        fe->writeArgs.get(list)->push_back(reg);
+        fe->writeArgs.get(list)->push_back(exp);
         return list;
     }
 };
