@@ -2,10 +2,15 @@ var
   a : integer; b : boolean; 
 begin
 	a := 1+7;
+	write(a);
 	a := 3-1;
+	write(a);
 	a := 4*4;
+	write(a);
 	a := 3/2;
+	write(a);
 	a := 7%3;
+	write(a);
 	b := true&true;
 	b := true|true;
 	b := 1<=1;

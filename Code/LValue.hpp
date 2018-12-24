@@ -17,8 +17,9 @@ public:
 class IDLValue : public LValue
 {
 public:
-    IDLValue(char* ident) {
+    IDLValue(char* ident, std::shared_ptr<Type> t) {
         id = ident;
+	type = t;
     }
 
 private:
