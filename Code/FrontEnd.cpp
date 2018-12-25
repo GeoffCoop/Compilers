@@ -217,6 +217,7 @@ int SuccExpr(int x){
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(r) + ", 1\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
+    
     return x;
 }
 int PredExpr(int x){
@@ -309,7 +310,7 @@ int MinExpr(int x, int y){
     std::string out = "\tsub \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
     reg.release(xr);
     reg.release(yr);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
+    auto z = fe->expressions.add(std::make_shared<Expression>(std::make_shared<IntType>(), r));
     // std::cout << out <<std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
@@ -336,7 +337,7 @@ int PlusExpr(int x, int y){
     std::string out = "\tadd \t$t" + std::to_string(r) + ", $t" + std::to_string(xr) + ", $t" + std::to_string(yr) + "\n";
     reg.release(xr);
     reg.release(yr);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
+    auto z = fe->expressions.add(std::make_shared<Expression>(std::make_shared<IntType>(), r));
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
@@ -684,7 +685,7 @@ int stackIdentList(int list, char* ident) {
 char* lookupType(char* ident) { // pass type name through if it exist
     auto fe = FrontEnd::instance();
     if (fe->getSymbolTable()->findEntry(ident) == nullptr){
-        std::cout << "ERROR WITH TYPE " << std::string(ident) << ". Type non-existant." << std::endl;
+        std::cout << "ERROR WITH TYPE " << std::string(ident)<< ". Type non-existant." << std::endl;
     }
     return ident;
 }
