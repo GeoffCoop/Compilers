@@ -3,7 +3,7 @@
 
 #include "../Type.hpp"
 #include <memory>
-
+#include <iostream>
 class Expression 
 {
 public:

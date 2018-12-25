@@ -437,7 +437,6 @@ int LValueExpr(int x){
     auto fe = FrontEnd::instance();
     auto r = reg.getRegister();
     auto lval = fe->lValues.get(x);
-
     //if lValID
     auto off = fe->getSymbolTable()->findEntry(lval->id)->getMemLoc();
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "\n";
@@ -460,7 +459,7 @@ int LValID(char* id){
     auto symbol_ptr = fe->getSymbolTable()->findEntry(id);
     int i = -1;
     if (symbol_ptr != nullptr) {
-        i = fe->lValues.add(std::make_shared<IDLValue>(id));
+        i = fe->lValues.add(std::make_shared<IDLValue>(id, symbol_ptr->getType()));
     }
     else {
         //throw error about id not existing;
@@ -518,6 +517,7 @@ int AssignStmt(int lval, int expr){
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(sym->getMemLoc()) + "\n";
     out += "\tsw \t$t" + std::to_string(e->r) + ", 0($t" + std::to_string(r) + ")\n";
     fe->addCode(out);
+	return 0;
 }
 int MergeConditional(int expr, int stmts){
 //    auto fe = FrontEnd::instance();
@@ -600,7 +600,7 @@ int WriteStmt(int argList){
         std::string out = "";
         if (type->name() == "int") { 
             out += "\tli \t$v0, 1\n";
-            out += "\tlw \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + "\n";
             out += "\tsyscall\n";
          }
         else if (type->name() == "char") {
@@ -659,7 +659,7 @@ int NewStatementSequence(int stmt){
  //   return fe->slist.add(std::make_shared<std::vector<std::shared_ptr<Statement>>>(vec));
 }
 int StackStatementSequence(int list, int stmt){
- //   auto fe = FrontEnd::instance();
+ //   auto fe = FrontEnd::instance(); 
 //    auto ss = fe->slist.get(list);
 //    ss->push_back(fe->statements.get(stmt));
 //    return list;
