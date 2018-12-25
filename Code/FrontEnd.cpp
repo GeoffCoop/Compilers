@@ -214,7 +214,7 @@ int CharExpr(char x){
 int SuccExpr(int x){
     auto fe = FrontEnd::instance();
     int r = fe->expressions.get(x)->r;
-    std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(r) + ", 1\n";
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + ", 1\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return x;
@@ -222,7 +222,7 @@ int SuccExpr(int x){
 int PredExpr(int x){
     auto fe = FrontEnd::instance();
     int r = fe->expressions.get(x)->r;
-    std::string out = "\taddi \t$t" + std::to_string(r) + ", $" + std::to_string(r) + ", -1\n";
+    std::string out = "\taddi \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + ", -1\n";
     FrontEnd::instance()->addCode(out);
     return x;
 }

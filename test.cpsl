@@ -3,6 +3,12 @@ var
 begin
 	a := 1+7;
 	write(a);
+	a:= succ(a);
+	write(a);
+	a:= pred(a);
+	write(a);
+	a:=-a;
+	write(a);
 	a := 3-1;
 	write(a);
 	a := 4*4;
