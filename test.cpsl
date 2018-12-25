@@ -1,5 +1,5 @@
 var
-  a : integer; b : boolean; 
+  a : integer; b : boolean; c : char;
 begin
 	a := 1+7;
 	write(a);
@@ -15,9 +15,19 @@ begin
 	write(a);
 	a := 3/2;
 	write(a);
-	a := 7%3;
+	a := 33%34;
 	write(a);
+	
+	c := chr(a);
+	write(c);
+	write(ord(c));
+
+	b:= true;
+	write(b);
+	b:= false;
+	write(b);
 	b := true&true;
+	write(b);
 	b := true|true;
 	b := 1<=1;
 	b := 1>=1;
