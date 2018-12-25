@@ -217,6 +217,7 @@ int SuccExpr(int x){
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + ", 1\n";
     // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
+    
     return x;
 }
 int PredExpr(int x){
@@ -684,7 +685,7 @@ int stackIdentList(int list, char* ident) {
 char* lookupType(char* ident) { // pass type name through if it exist
     auto fe = FrontEnd::instance();
     if (fe->getSymbolTable()->findEntry(ident) == nullptr){
-        std::cout << "ERROR WITH TYPE " << std::string(ident) << ". Type non-existant." << std::endl;
+        std::cout << "ERROR WITH TYPE " << std::string(ident)<< ". Type non-existant." << std::endl;
     }
     return ident;
 }
