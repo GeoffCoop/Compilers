@@ -187,7 +187,6 @@ int StringExpr(char* x){
     std::string out = "\tli \t$t"+ std::to_string(r) + std::string(", st") + std::to_string(i) + "\n";
     FrontEnd::instance()->addCode(out);
     auto l = fe->expressions.add(exp);
-    // std::cout << out << std::endl;
     return l;
 }
 int IntExpr(int x){
@@ -195,7 +194,6 @@ int IntExpr(int x){
     int r = reg.getRegister();
     auto exp = std::make_shared<Expression>(BuiltInType::getInt(), r);
     std::string out = "\tli \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x) + "\n";
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     auto l = fe->expressions.add(exp);
     return l;
@@ -205,7 +203,6 @@ int CharExpr(char x){
     int r = reg.getRegister();
     auto exp = std::make_shared<Expression>(BuiltInType::getChar(), r);
     std::string out = "\tli \t$t" + std::to_string(r) + std::string(", ") + std::to_string(x) + "\n";
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     auto l = fe->expressions.add(exp);
     return r;
@@ -215,7 +212,6 @@ int SuccExpr(int x){
     auto fe = FrontEnd::instance();
     int r = fe->expressions.get(x)->r;
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + ", 1\n";
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     
     return x;
@@ -228,27 +224,25 @@ int PredExpr(int x){
     return x;
 }
 int ChrExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto exp = fe->expressions.get(x);
-//    return fe->expressions.add(std::make_shared<Chr>(exp));
+    auto fe = FrontEnd::instance();
+    auto exp = fe->expressions.get(x);
+    return fe->expressions.add(std::make_shared<Expression>(BuiltInType::getChar(), exp->r));
 }
 int OrdExpr(int x){
-//    auto fe = FrontEnd::instance();
-//    auto exp = fe->expressions.get(x);
-//    return fe->expressions.add(std::make_shared<Ord>(exp));
+    auto fe = FrontEnd::instance();
+    auto exp = fe->expressions.get(x);
+    return fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), exp->r));
 }
 int UMinusExpr(int x){
     auto fe = FrontEnd::instance();
     int r = fe->expressions.get(x)->r;
     std::string out = "\tsub \t$t" + std::to_string(r) + ", $0, $t" + std::to_string(r) + "\n";
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return x;
 }
 int NotExpr(int x){
     int r = FrontEnd::instance()->expressions.get(x)->r;
     std::string out = "\tnot \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + "\n";
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return x;
 }
@@ -264,9 +258,7 @@ int ModExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    // std::cout << out2 << std::endl;
     FrontEnd::instance()->addCode(out2);
     return z;
 }
@@ -280,9 +272,7 @@ int DivExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    // std::cout << out2 << std::endl;
     FrontEnd::instance()->addCode(out2);
     return z;
 }
@@ -296,9 +286,7 @@ int MultExpr(int x, int y){ //THIS IS INCOMPLETE, NEED HI/LO LOGIC IN HERE
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
-    // std::cout << out2 << std::endl;
     FrontEnd::instance()->addCode(out2);
     return z;
 }
@@ -311,7 +299,6 @@ int MinExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(std::make_shared<IntType>(), r));
-    // std::cout << out <<std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -325,7 +312,6 @@ int GTExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -338,7 +324,6 @@ int PlusExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(std::make_shared<IntType>(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -351,7 +336,6 @@ int LTExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -364,7 +348,6 @@ int GTEExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -377,7 +360,6 @@ int LTEExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -390,7 +372,6 @@ int NEExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -403,7 +384,6 @@ int EQExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl; 
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -416,7 +396,6 @@ int AndExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -429,7 +408,6 @@ int OrExpr(int x, int y){
     reg.release(xr);
     reg.release(yr);
     auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r));
-    // std::cout << out << std::endl;
     FrontEnd::instance()->addCode(out);
     return z;
 }
@@ -600,22 +578,22 @@ int WriteStmt(int argList){
         std::string out = "";
         if (type->name() == "int") { 
             out += "\tli \t$v0, 1\n";
-            out += "\tmove \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + "# write int\n";
             out += "\tsyscall\n";
          }
         else if (type->name() == "char") {
             out += "\tli \t$v0, 11\n";
-            out += "\tlw \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + "# write char\n";
             out += "\tsyscall\n";
         }
         else if (type->name() == "string") {
             // out += "\tli \t$v0, 1\n";
-            // out += "\tlw \t$a0, $t" + std::to_string() + "\n";
+            // out += "\tmove \t$a0, $t" + std::to_string() + "# write string\n";
             // out += "\tsyscall\n";
         }
         else if (type->name() == "bool") {
             out += "\tli \t$v0, 1\n";
-            out += "\tlw \t$a0, $t" + std::to_string(r) + "\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + "# write boolean\n";
             out += "\tsyscall\n";
         }
         else {} // non-printable type
