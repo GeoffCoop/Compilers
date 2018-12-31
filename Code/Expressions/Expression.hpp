@@ -7,6 +7,7 @@
 class Expression 
 {
 public:
+    Expression(){}
     Expression(std::shared_ptr<Type> t, int reg): r(reg), type(t) {}
     std::shared_ptr<Type> type;
     int r;
@@ -14,12 +15,12 @@ public:
 
 class Literal : public Expression {
 public:
-    Literal(char c){ value = static_cast<int>c; }
+    Literal(char c){ value = static_cast<int>(c); }
     Literal(int i) { value = value; }
     Literal(bool b) { value = b; }
     int getVal() { return value; }
 private:
     int value;
-}
+};
 
 #endif

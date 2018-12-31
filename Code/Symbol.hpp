@@ -31,6 +31,7 @@ public:
 };
 
 class ConstSymbol: public Symbol {
+public:
 	ConstSymbol(std::shared_ptr<Type> type, int value){
 		m_type = type;
 		m_value = value;

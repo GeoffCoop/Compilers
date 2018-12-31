@@ -83,10 +83,10 @@ public:
             fe->getSymbolTable()->addEntry("BOOLEAN", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), fe->getSymbolTable()->getOffset()));
             fe->getSymbolTable()->addEntry("string", std::make_shared<TypeSymbol>(BuiltInType::getString(), fe->getSymbolTable()->getOffset()));
             fe->getSymbolTable()->addEntry("STRING", std::make_shared<TypeSymbol>(BuiltInType::getString(), fe->getSymbolTable()->getOffset()));
-            fe->getSymbolTable()->addEntry("true", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), fe->getSymbolTable()->getOffset()));
-            fe->getSymbolTable()->addEntry("TRUE", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), fe->getSymbolTable()->getOffset()));
-            fe->getSymbolTable()->addEntry("false", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), fe->getSymbolTable()->getOffset()));
-            fe->getSymbolTable()->addEntry("FALSE", std::make_shared<TypeSymbol>(BuiltInType::getBoolean(), fe->getSymbolTable()->getOffset()));
+            fe->getSymbolTable()->addEntry("true", std::make_shared<ConstSymbol>(BuiltInType::getBoolean(), static_cast<int>(true)));
+            fe->getSymbolTable()->addEntry("TRUE", std::make_shared<ConstSymbol>(BuiltInType::getBoolean(), static_cast<int>(true)));
+            fe->getSymbolTable()->addEntry("false", std::make_shared<ConstSymbol>(BuiltInType::getBoolean(), static_cast<int>(false)));
+            fe->getSymbolTable()->addEntry("FALSE", std::make_shared<ConstSymbol>(BuiltInType::getBoolean(), static_cast<int>(false)));
         }
 	return fe;
     }
@@ -417,6 +417,7 @@ int LValueExpr(int x){
     auto lval = fe->lValues.get(x);
     //if lValID
     auto off = fe->getSymbolTable()->findEntry(lval->id)->getMemLoc();
+//	std::cout << lval->id << std::endl;
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "\n";
     out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
     fe->addCode(out);
