@@ -411,16 +411,23 @@ int OrExpr(int x, int y){
     FrontEnd::instance()->addCode(out);
     return z;
 }
-int LValueExpr(int x){
+int LValueExpr(int x){ // x is a # in lValues
     auto fe = FrontEnd::instance();
     auto r = reg.getRegister();
     auto lval = fe->lValues.get(x);
     //if lValID
-    auto off = fe->getSymbolTable()->findEntry(lval->id)->getMemLoc();
-//	std::cout << lval->id << std::endl;
+    auto sym = fe->getSymbolTable()->findEntry(lval->id);
+    std::string out = "";
+    if (sym->getSub() == "Const") {
+	out += "\tli \t$t" + std::to_string(r) + ", " + std::to_string(sym->m_value) + "\t# load Const\n";
+	fe->addCode(out);
+    }
+    else {
+    auto off = sym->getMemLoc();
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "\n";
-    out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
-    fe->addCode(out);
+    out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\t# load var\n" ;
+	fe->addCode(out);
+    }
     auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r));
     return z;
 }
@@ -490,11 +497,13 @@ int StackArguments(int list, int expr){
 int AssignStmt(int lval, int expr){
     auto fe = FrontEnd::instance();
     auto l = fe->lValues.get(lval);
+	// if const, throw error
     auto r = reg.getRegister();
     auto e = fe->expressions.get(expr);
     auto sym = fe->getSymbolTable()->findEntry(l->id);
     std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(sym->getMemLoc()) + "\n";
     out += "\tsw \t$t" + std::to_string(e->r) + ", 0($t" + std::to_string(r) + ")\n";
+    reg.release(r);
     fe->addCode(out);
 	return 0;
 }
@@ -579,22 +588,23 @@ int WriteStmt(int argList){
         std::string out = "";
         if (type->name() == "int") { 
             out += "\tli \t$v0, 1\n";
-            out += "\tmove \t$a0, $t" + std::to_string(r) + "# write int\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + " # write int\n";
             out += "\tsyscall\n";
          }
         else if (type->name() == "char") {
             out += "\tli \t$v0, 11\n";
-            out += "\tmove \t$a0, $t" + std::to_string(r) + "# write char\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + " # write char\n";
             out += "\tsyscall\n";
         }
         else if (type->name() == "string") {
             // out += "\tli \t$v0, 1\n";
-            // out += "\tmove \t$a0, $t" + std::to_string() + "# write string\n";
+            // out += "\tmove \t$a0, $t" + std::to_string() + " # write string\n";
             // out += "\tsyscall\n";
         }
         else if (type->name() == "bool") {
             out += "\tli \t$v0, 1\n";
-            out += "\tmove \t$a0, $t" + std::to_string(r) + "# write boolean\n";
+	    out += "\tsne \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + ", $zero\n";
+            out += "\tmove \t$a0, $t" + std::to_string(r) + " # write boolean\n";
             out += "\tsyscall\n";
         }
         else {} // non-printable type

@@ -14,11 +14,12 @@ public:
 	// 	{}
 	int getMemLoc() { return m_memoryLocation; }
 	std::shared_ptr<Type> getType() { return m_type; }
+	virtual std::string getSub() { return ""; }
+	int m_value = 0;
 protected:
 	std::string id;
 	std::shared_ptr<Type> m_type;
 	int m_memoryLocation;
-
 };
 
 class VarSymbol: public Symbol {
@@ -28,6 +29,7 @@ public:
 		m_type = type;
 		m_memoryLocation = memoryLocation;
 	}
+	std::string getSub() { return "Var"; }
 };
 
 class ConstSymbol: public Symbol {
@@ -36,7 +38,8 @@ public:
 		m_type = type;
 		m_value = value;
 	}
-	int m_value;
+//	int m_value;
+	std::string getSub() { return "Const"; }
 };
 
 class TypeSymbol: public Symbol {
@@ -45,6 +48,7 @@ public:
 		m_type = type;
 		m_memoryLocation = memoryLocation;
 	}
+	std::string getSub() { return "Type"; }
 };
 
 #endif
