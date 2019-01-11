@@ -31,9 +31,10 @@ class MemberLValue : public LValue
     MemberLValue(LValue base, char* ident);
 };
 
-class ArrayAccesLValue : public LValue
+class ArrayAccessLValue : public LValue
 {
-    ArrayAccesLValue(LValue base, Expression expr);
+public:
+    ArrayAccessLValue(std::shared_ptr<LValue> base, std::shared_ptr<Expression> expr, std::shared_ptr<Type> type){};
 };
 
 #endif

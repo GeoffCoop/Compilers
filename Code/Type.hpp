@@ -40,7 +40,13 @@ class RecordType : public Type
 {};
 
 class ArrayType : public Type
-{};
+{	
+	ArrayType(std::shared_ptr<Type> t, int l, int u): type(t), lower(l), upper(u)
+	{}
+	std::shared_ptr<Type> type;
+	int lower;
+	int upper;
+};
 
 class BuiltInType {
 public:

@@ -458,11 +458,13 @@ int LValMemberAccess(int base, char* ident){
 //    auto lval = fe->lValues.get(base);
 //    return fe->lValues.add(std::make_shared<MemberLValue>(lval, ident));
 }
-int LValArrayAccess(int base, int access){
-//    auto fe = FrontEnd::instance();
-//    auto lval = fe->lValues.get(base);
-//    auto expr = fe->expressions.get(access);
-//    return fe->lValues.add(std::make_shared<ArrayAccesLValue>(lval, expr));
+int LValArrayAccess(int base, int access){ //base is the LValue returned from LValID
+    auto fe = FrontEnd::instance();
+    auto lval = fe->lValues.get(base);
+    auto exp = fe->expressions.get(access);
+    auto type = lval->type;
+    auto z = fe->lValues.add(std::make_shared<ArrayAccessLValue>(lval, exp, type)); 
+      
 }
 int NewLValList(int lVal){
 //    auto fe = FrontEnd::instance();
