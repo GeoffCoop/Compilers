@@ -1,0 +1,18 @@
+const 
+	a = 3;
+	b = true;
+	c = "Hello there!";
+	d = 6+a;
+	e = 'e';
+type
+	myArray = array[a:b] of integer;
+var
+	m : myArray;
+	s : string;
+begin
+	m[3] := 1;
+	m[4] := 2;
+	m[5] := 3;
+	s := c;
+	write(s);
+end.

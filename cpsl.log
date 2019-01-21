@@ -1,0 +1,70 @@
+20:40:14 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+20:40:14 [SymbolTable.cpp:60|t2:2] adding variable b::bool
+20:40:14 [Optimizer.cpp:16|t2:9] Optimizing flowgraph
+20:54:08 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+20:54:08 [SymbolTable.cpp:60|t2:2] adding variable b::bool
+20:54:08 [Optimizer.cpp:16|t2:7] Optimizing flowgraph
+19:47:01 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:47:01 [parser.y:362|t2:7] syntax error, unexpected ARRAYSY, expecting IDENTSY
+19:47:01 [parser.y:362|t2:7] Aborting application. Reason: Fatal log at [FrontEnd/parser.y:362]
+19:48:22 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:48:22 [parser.y:362|t2:9] syntax error, unexpected EQSY, expecting ASSIGNSY or DOTSY or LBRACKETSY
+19:48:22 [parser.y:362|t2:9] Aborting application. Reason: Fatal log at [FrontEnd/parser.y:362]
+19:48:59 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:48:59 [parser.y:362|t2:2] syntax error, unexpected ASSIGNSY, expecting EQSY
+19:48:59 [parser.y:362|t2:2] Aborting application. Reason: Fatal log at [FrontEnd/parser.y:362]
+19:50:18 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:50:18 [parser.y:362|t2:7] syntax error, unexpected ASSIGNSY, expecting EQSY
+19:50:18 [parser.y:362|t2:7] Aborting application. Reason: Fatal log at [FrontEnd/parser.y:362]
+19:51:03 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:51:03 [LValue.hpp:62|t2:13] Invalid variable lookup a
+
+19:51:03 [LValue.hpp:62|t2:13] Aborting application. Reason: Fatal log at [/home/kyle/Desktop/CS6300/AST_INC/AST/LValue.hpp:62]
+19:53:29 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:53:29 [LValue.hpp:62|t2:13] Invalid variable lookup myArray
+
+19:53:29 [LValue.hpp:62|t2:13] Aborting application. Reason: Fatal log at [/home/kyle/Desktop/CS6300/AST_INC/AST/LValue.hpp:62]
+19:55:28 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:55:28 [easylogging++.h:7442|t2:9] CRASH HANDLED; Application has crashed due to [SIGSEGV] signal
+19:55:28 [easylogging++.h:7442|t2:9] Aborting application. Reason: Fatal log at [/home/kyle/Desktop/CS6300/log/easylogging++.h:7442]
+19:59:27 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+19:59:27 [easylogging++.h:7442|t2:9] CRASH HANDLED; Application has crashed due to [SIGSEGV] signal
+19:59:27 [easylogging++.h:7442|t2:9] Aborting application. Reason: Fatal log at [/home/kyle/Desktop/CS6300/log/easylogging++.h:7442]
+20:01:28 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+20:01:28 [easylogging++.h:7442|t2:9] CRASH HANDLED; Application has crashed due to [SIGSEGV] signal
+20:01:28 [easylogging++.h:7442|t2:9] Aborting application. Reason: Fatal log at [/home/kyle/Desktop/CS6300/log/easylogging++.h:7442]
+20:05:17 [main.cpp:92|:1] Compiling ./t2.cpsl to o.asm
+20:05:17 [SymbolTable.cpp:60|t2:9] adding variable m::array
+20:05:17 [Optimizer.cpp:16|t2:15] Optimizing flowgraph
+21:28:37 [main.cpp:92|:1] Compiling t2.cpsl to o2.asm
+21:28:37 [SymbolTable.cpp:60|t2:9] adding variable m::array
+21:28:37 [Optimizer.cpp:16|t2:15] Optimizing flowgraph
+21:29:07 [main.cpp:92|:1] Compiling t2.cpsl to o2.asm
+21:29:07 [SymbolTable.cpp:60|t2:9] adding variable m::array
+21:29:07 [Optimizer.cpp:16|t2:15] Optimizing flowgraph
+21:36:52 [main.cpp:92|:1] Compiling t2.cpsl to o2.asm
+21:36:52 [SymbolTable.cpp:60|t2:9] adding variable m::array
+21:36:52 [Optimizer.cpp:16|t2:15] Optimizing flowgraph
+21:41:47 [main.cpp:92|:1] Compiling t2.cpsl to o2.asm
+21:41:47 [SymbolTable.cpp:60|t2:10] adding variable m::array
+21:41:47 [Optimizer.cpp:16|t2:16] Optimizing flowgraph
+14:11:44 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+14:11:44 [SymbolTable.cpp:60|t2:10] adding variable m::array
+14:11:44 [Optimizer.cpp:16|t2:16] Optimizing flowgraph
+14:13:06 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+14:13:06 [SymbolTable.cpp:60|t2:10] adding variable m::array
+14:13:06 [SymbolTable.cpp:60|t2:11] adding variable s::string
+14:13:06 [Optimizer.cpp:16|t2:17] Optimizing flowgraph
+14:13:39 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+14:13:39 [SymbolTable.cpp:60|t2:10] adding variable m::array
+14:13:39 [SymbolTable.cpp:60|t2:11] adding variable s::string
+14:13:39 [parser.y:362|t2:16] syntax error, unexpected EQSY, expecting ASSIGNSY or DOTSY or LBRACKETSY
+14:13:39 [parser.y:362|t2:16] Aborting application. Reason: Fatal log at [FrontEnd/parser.y:362]
+14:13:58 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+14:13:58 [SymbolTable.cpp:60|t2:10] adding variable m::array
+14:13:58 [SymbolTable.cpp:60|t2:11] adding variable s::string
+14:13:58 [Optimizer.cpp:16|t2:18] Optimizing flowgraph
+14:14:38 [main.cpp:92|:1] Compiling t2.cpsl to o.asm
+14:14:38 [SymbolTable.cpp:60|t2:10] adding variable m::array
+14:14:38 [SymbolTable.cpp:60|t2:11] adding variable s::string
+14:14:38 [Optimizer.cpp:16|t2:19] Optimizing flowgraph

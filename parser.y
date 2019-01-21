@@ -131,7 +131,7 @@ ConstDecls: ConstDecls ConstDecl
 	| ConstDecl
 	;
 
-ConstDecl: IDENT_SYMBOL EQUAL_SYMBOL Expression SCOLON_SYMBOL {}
+ConstDecl: IDENT_SYMBOL EQUAL_SYMBOL Expression SCOLON_SYMBOL { addConst($1, $3); }
 	;
 
 PFDecl: PFDecl ProcedureDecl

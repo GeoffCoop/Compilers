@@ -60,4 +60,5 @@
 	int stackIdentList(int, char*);	
 	char* lookupType(char*);
 	int addVar(int, char*);
+	int addConst(char*, int);
 #endif
