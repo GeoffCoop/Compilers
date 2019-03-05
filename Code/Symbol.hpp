@@ -38,15 +38,15 @@ public:
 		m_type = type;
 		m_value = value;
 	}
+	ConstSymbol(std::shared_ptr<Type> type, char* str){}
 //	int m_value;
 	std::string getSub() { return "Const"; }
 };
 
 class TypeSymbol: public Symbol {
 public:
-	TypeSymbol(std::shared_ptr<Type> type, int memoryLocation){
+	TypeSymbol(std::shared_ptr<Type> type){
 		m_type = type;
-		m_memoryLocation = memoryLocation;
 	}
 	std::string getSub() { return "Type"; }
 };

@@ -58,7 +58,9 @@
 	int StackStatementSequence(int, int);
 	
 	int stackIdentList(int, char*);	
-	char* lookupType(char*);
-	int addVar(int, char*);
+	int lookupType(char*);
+	int addVar(int, int);
 	int addConst(char*, int);
+	int addType(char*, int);
+	int addArrayType(int, int, int );
 #endif

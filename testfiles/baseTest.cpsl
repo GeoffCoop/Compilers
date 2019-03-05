@@ -1,0 +1,60 @@
+var
+  a, b : integer;
+	c, d : boolean;
+	e, f : char;
+	g, h, n : string;
+begin
+	n := "\n";
+	write(n);
+
+$ ARITHEMTIC LOGIC    -5410864
+	a := 64; 						$ integer assignment
+	a := a - 4;					$ sub
+	a := a*2; 					$	mult
+	a := a/3; 					$	div
+	a := a % 35;				$	mod
+	a := pred(pred(a));	$	pred
+	a := succ(a);				$ succ
+	a := a + 50;				$ add
+	a := -a;						$	umin
+	write(a);						$ -54
+	a := -a;
+	b:= a;							$ var to var assignment
+	write(a+b);					$ var + var
+	write(ord('z'));		$ ord
+	write(n);
+
+$ RELOPS							001101
+	write(a > b);				$ gt
+	write(a < b);				$ lt
+	write(a >= b); 			$ gte
+	write(a <= b);			$ lte
+	write(a <> b);			$ neq
+	write(a = b);				$ eq
+	write(n);
+
+$ BOOLEAN LOGIC				1001
+	c := (a = b);				$ booleam assignment
+	d := c;							$ var to var assignment;
+	d := false;
+	write(c | d);				$ or
+	write(false & c);		$ and
+	write(~c);					$ not
+	write(true);				$ const
+	write(n);
+	
+$ CHAR LOGIC					66c
+	e := chr(a);				$ chr / char assignment
+	write(e);						$
+	f := e;							$ var to var assignment	
+	write(f);
+	write('c');					$ const
+	write(n);
+
+$ STRING 					Hello World \\ THE END
+	g := "Hello World!\n";	$ string assignment
+	h := g;									$ var to var assignment
+	write(h);								$ write
+	write("THE END\n");			$ const
+
+end.

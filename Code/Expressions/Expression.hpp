@@ -2,30 +2,75 @@
 #define EXPRESSION_HPP
 
 #include "../Type.hpp"
+#include "../StringTable.hpp"
+
 #include <memory>
 #include <iostream>
+#include <string>
+
+enum ExpressionType {
+    OR,
+    AND,
+    EQUAL,
+    NOTEQUAL,
+    LTE,
+    GTE,
+    GT,
+    LT,
+    MINUS,
+    PLUS,
+    MULT,
+    DIV,
+    MODULO,
+    NOT,
+    UMIN,
+    FUNCCALL,
+    CHR,
+    ORD,
+    PRED,
+    SUCC,
+    LVAL,
+    CHRCONST,
+    INTCONST,
+    STRINGCONST,
+    BOOLEANCONST,
+    NONE
+};
+
 class Expression 
 {
 public:
     Expression(){}
-    Expression(std::shared_ptr<Type> t, int reg): r(reg), type(t) {}
+    Expression(std::shared_ptr<Type> t, int reg, std::shared_ptr<Expression> c1, std::shared_ptr<Expression> c2, ExpressionType expt): 
+        r(reg), type(t), child1(c1), child2(c2), exp(expt) {}
     std::shared_ptr<Type> type;
     int getValue() {return value;}
+    void setValue(int x) { value = x; }
     int r;
     virtual bool isLiteral() { return false; }
-private:
+    std::string emit();
+protected:
+    std::shared_ptr<Expression> child1;
+    std::shared_ptr<Expression> child2;
     int value = 0;
+    ExpressionType exp;
 };
 
 class Literal : public Expression {
 public:
-    Literal(char c, int r): Expression(BuiltInType::getChar(), r){ value = static_cast<int>(c); }
-    Literal(int i, int r): Expression(BuiltInType::getInt(), r) { value = value; }
-    Literal(bool b, int r): Expression(BuiltInType::getBoolean(), r) { value = b; }
-    int getVal() { return value; }
+    Literal(char c, int r): Expression(BuiltInType::getChar(), r, nullptr, nullptr, ExpressionType::CHRCONST){ value = static_cast<int>(c); }
+    Literal(int i, int r): Expression(BuiltInType::getInt(), r, nullptr, nullptr, ExpressionType::INTCONST) { value = i; }
+    Literal(bool b, int r): Expression(BuiltInType::getBoolean(), r, nullptr, nullptr, ExpressionType::BOOLEANCONST) { value = b; }
+    Literal(char* c, int r): Expression(BuiltInType::getString(), r, nullptr, nullptr, ExpressionType::STRINGCONST) { value = StringTable::instance()->addString(c); }
+    std::string emit();
     bool isLiteral() { return true; }
-private:
-    int value;
+};
+
+class MemoryAccess : public Expression {
+public:
+    MemoryAccess() {}
+    int offset;
+    std::string emit();
 };
 
 #endif

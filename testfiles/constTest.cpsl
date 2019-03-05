@@ -1,0 +1,48 @@
+const
+	one = 1;
+	tru = true;
+	Ee = 'e';
+	n = "\n";
+	HW = "Hello World!!!\n";
+var
+  a, b : integer;
+	c, d : boolean;
+	e, f : char;
+	g, h, n : string;
+begin
+	write(n);
+
+$ ARITHEMTIC LOGIC    121
+	a := one; 					$ integer assignment			
+	write(a);						$ -54
+	b := one + a;
+	write(b);
+	write(one);
+	write(n);
+
+$ BOOLEAN LOGIC				10101
+	c := tru;				$ booleam assignment
+	write(c);
+	d := ~tru;						
+	write(d);
+	write(tru | d);				$ or
+	write(tru & d);		$ and
+	write(tru);					$ not
+	write(n);
+	
+$ CHAR LOGIC					eee
+	e := Ee;				$ chr / char assignment
+	write(e);						$
+	f := e;							$ var to var assignment	
+	write(f);
+	write(Ee);					$ const
+	write(n);
+
+$ STRING 					Hello World \\ HelloWorld \\ THE END
+	g := HW;	$ string assignment
+	h := g;									$ var to var assignment
+	write(h);								$ write
+	write(HW);
+	write("THE END\n");			$ const
+
+end.

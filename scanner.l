@@ -84,7 +84,7 @@ write|WRITE		{  return WRITE_SYMBOL;}
 \$.*$			{}
 \n			{lineNum++;}
 [ \t]+			{}
-.			{}
+.			{ std::cout << std::string("unexpected token ") + yytext + std::string(" on line") + to_string(lineNum)<< std::endl; }
 
 \"[a-zA-Z0-9~`!@#$%^&*()_+=\-\[\]{}\\\/><,.:;| ]*\"	{ yylval.str_val = strdup(yytext); return STRING_SYMBOL;}
 

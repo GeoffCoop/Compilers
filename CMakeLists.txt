@@ -36,6 +36,7 @@ set(code_srcs
 	Code/Symbol.hpp
 	Code/Type.hpp
 	Code/LValue.hpp
+	Code/LValue.cpp
 	Code/Program.hpp
 	Code/ThreeAddressInstruction.hpp
 	Code/ThreeAddressInstruction.cpp
@@ -71,6 +72,7 @@ set(expression_srcs
 	Code/Expressions/div.hpp
 	Code/Expressions/eq.hpp
 	Code/Expressions/Expression.hpp
+	Code/Expressions/Expression.cpp
 	Code/Expressions/functionCall.hpp
 	Code/Expressions/gte.hpp
 	Code/Expressions/gt.hpp

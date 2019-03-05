@@ -1,4 +1,4 @@
-%{
+	%{
 #include<iostream>
 #include<fstream>
 #include "Code/FrontEnd.hpp"
@@ -112,9 +112,12 @@ void yyerror(const char*);
 %type <int_val> Statement
 %type <int_val> StatementSequence
 
+
 %type <int_val> IdentList
-%type <str_val> SimpleType
-%type <str_val> Type
+%type <int_val> SimpleType
+%type <int_val> ArrayType
+%type <int_val> RecordType
+%type <int_val> Type
 
 %%
 Program: ProgramHead Block DOT_SYMBOL{ emitMIPS(); }
@@ -174,18 +177,18 @@ TypeDecls: TypeDecl
 	| TypeDecls TypeDecl
 	;
 
-TypeDecl: IDENT_SYMBOL EQUAL_SYMBOL Type SCOLON_SYMBOL
+TypeDecl: IDENT_SYMBOL EQUAL_SYMBOL Type SCOLON_SYMBOL { addType($1, $3); }
 	;
 
 Type: SimpleType { $$ = $1; }
-	| RecordType
-	| ArrayType
+	| RecordType { $$ = $1; }
+	| ArrayType { $$ = $1; }
 	;
 
 SimpleType: IDENT_SYMBOL { $$ = lookupType($1); }
 	;
 
-RecordType: RECORD_SYMBOL RecordDecls END_SYMBOL
+RecordType: RECORD_SYMBOL RecordDecls END_SYMBOL { $$ = 0; }
 	;
 
 RecordDecls: 
@@ -195,7 +198,7 @@ RecordDecls:
 RecordDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
 	;
 
-ArrayType: ARRAY_SYMBOL LBRACKET_SYMBOL Expression COLON_SYMBOL Expression RBRACKET_SYMBOL OF_SYMBOL Type
+ArrayType: ARRAY_SYMBOL LBRACKET_SYMBOL Expression COLON_SYMBOL Expression RBRACKET_SYMBOL OF_SYMBOL Type { $$ = addArrayType($3, $5, $8); }
 	;
 
 IdentList: IDENT_SYMBOL						{ $$ = stackIdentList(-1, $1); }
@@ -317,7 +320,7 @@ Expression: Expression OR_SYMBOL Expression	{$$=OrExpr($1,$3);}
 	| STRING_SYMBOL				{ $$ = StringExpr($1); }
 	;
 
-LValue: IDENT_SYMBOL										{ $$ = LValID($1);}
+LValue: IDENT_SYMBOL				{ $$ = LValID($1);}
 	| LValue DOT_SYMBOL IDENT_SYMBOL						{}
 	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = LValArrayAccess($1, $3); }
 	;
