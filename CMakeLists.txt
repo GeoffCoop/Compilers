@@ -35,6 +35,7 @@ set(code_srcs
 	Code/SymbolTable.cpp
 	Code/Symbol.hpp
 	Code/Type.hpp
+	Code/Type.cpp
 	Code/LValue.hpp
 	Code/LValue.cpp
 	Code/Program.hpp

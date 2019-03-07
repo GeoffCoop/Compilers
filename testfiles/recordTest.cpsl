@@ -1,0 +1,35 @@
+type
+	myInt = integer;
+	myBool = boolean;
+	myChar = char;
+	myArray = array[7:11] of integer;
+	myRec = record
+		a : integer;
+		b : boolean;
+		c : char;
+		m : myArray;
+	end;
+
+var
+    r : myRec;
+	b : integer;
+	n : string;
+begin
+	n := "\n";
+	write(n);
+
+
+$ RECORD LOGIC
+	r.a := 10;
+	write(r.a);
+	r.b := true;
+	write(r.b);
+	r.c := 'c';
+	write(r.c);
+	r.m[r.a] := 999;
+	write(r.m[10]);
+
+	write(n);
+
+
+end.

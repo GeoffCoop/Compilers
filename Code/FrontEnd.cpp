@@ -116,6 +116,8 @@ public:
     NodeList<LValue> lValues;
     NodeList<std::vector<int>> writeArgs;
     NodeList<Type> types;
+    NodeList<std::pair<int, int>> members;
+    NodeList<std::vector<int>> membersList;
     //NodeList<std::vector<std::shared_ptr<Expression>>> arguments;
     //NodeList<Statement> statements;
     NodeList<std::vector<std::shared_ptr<LValue>>> lValList;
@@ -471,6 +473,14 @@ int LValID(char* id){
     return i;
 }
 int LValMemberAccess(int base, char* ident){
+    auto fe = FrontEnd::instance();
+    auto b = fe->lValues.get(base);
+    if (b->type->name() != "record") {
+        std::cout << "ERROR: THIS VARIABLE IS NOT A RECORD." << std::endl;
+        return -1;
+    }
+    return fe->lValues.add(std::make_shared<MemberLValue>(b, ident, fe->getSymbolTable()));
+
 }
 int LValArrayAccess(int base, int access){ //base is the LValue returned from LValID, acces is expression
     auto fe = FrontEnd::instance();
@@ -479,8 +489,16 @@ int LValArrayAccess(int base, int access){ //base is the LValue returned from LV
     auto z = fe->lValues.add(std::make_shared<ArrayAccessLValue>(b, e, fe->getSymbolTable())); 
     return z;
 }
-int NewLValList(int lVal){}
-int StackLVal(int list, int lVal){}
+
+int StackLVal(int list, int lVal){
+    auto fe = FrontEnd::instance();
+    if (list == -1) {
+        list = (fe->lValList.add(std::make_shared<std::vector<std::shared_ptr<LValue>>>()));
+    }
+    fe->lValList.get(list)->emplace_back(fe->lValues.get(lVal));
+    return list;
+    
+}
 #pragma endregion
 
 #pragma region arguments
@@ -592,9 +610,34 @@ int ReturnStmt(int expr){
 //    }
 }
 int ReadStmt(int lvals){
-//    auto fe = FrontEnd::instance();
-//    return fe->statements.add(std::make_shared<ReadStatement>(fe->lValList.get(lvals)));
+    auto fe = FrontEnd::instance();
+    auto list = fe->lValList.get(lvals);
+    for (int i = 0; i < list->size(); i++) {
+        auto type = list->at(i)->type;
+        if (type->name()=="array") {
+            type = std::dynamic_pointer_cast<ArrayType>(type)->type;
+        }
+        if (type->name()=="record"){
+            auto l = std::dynamic_pointer_cast<MemberLValue>(list->at(i))->member;
+            type = std::dynamic_pointer_cast<RecordType>(type)->getType(l);
+        }
+        std::string out = "";
+        auto r = reg.getRegister();
+        out += list->at(i)->getMemLoc(r);
+        if (type->name()=="int") {
+            out += "\tli \t$v0, 5\n";
+            out += "\tsyscall # Read Int\n";
+            out += "\tsw \t$v0, 0($t" + std::to_string(r) + ") \n";
+        }
+        else if (type->name()=="char") {
+            out += "\tli \t$v0, 12\n";
+            out += "\tsyscall # Read Char\n";
+            out += "\tsw \t$v0, 0($t" + std::to_string(r) + ")\n";
+        }
+        fe->addCode(out);
+    }
 }
+
 int WriteStmt(int argList){
     auto fe = FrontEnd::instance();
     auto list = fe->writeArgs.get(argList);
@@ -727,4 +770,36 @@ int addArrayType(int exp1, int exp2, int type) {
         EXIT_FAILURE;
     }
     return fe->types.add(std::make_shared<ArrayType>(t, e1->getValue(), e2->getValue()));
+}
+
+int addRecordType(int rec) {
+    auto fe = FrontEnd::instance();
+    auto membersList = fe->membersList.get(rec);
+    auto record = std::make_shared<RecordType>();
+    for (int i = 0; i < membersList->size(); i++){
+        auto members = fe->members.get(membersList->at(i));
+        auto identList = fe->identList.get(members->first);
+        for (int j = 0; j < identList->size(); j++){
+            record->addMember(identList->at(j), fe->types.get(members->second));
+        }
+    }
+    return fe->types.add(record);
+}
+
+int addRecords(int idList, int t) {
+    auto fe = FrontEnd::instance();
+    return fe->members.add(std::make_shared<std::pair<int, int>>(idList, t));
+}
+
+int stackRecords(int list, int rec) {
+    auto fe = FrontEnd::instance();
+    if (list == -1) {
+        int l = fe->membersList.add(std::make_shared<std::vector<int>>());
+        fe->membersList.get(l)->emplace_back(rec);
+        return l;
+    }
+    else {
+        fe->membersList.get(list)->emplace_back(rec);
+        return list;
+    }
 }

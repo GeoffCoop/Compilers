@@ -117,6 +117,8 @@ void yyerror(const char*);
 %type <int_val> SimpleType
 %type <int_val> ArrayType
 %type <int_val> RecordType
+%type <int_val> RecordDecl
+%type <int_val> RecordDecls
 %type <int_val> Type
 
 %%
@@ -188,14 +190,14 @@ Type: SimpleType { $$ = $1; }
 SimpleType: IDENT_SYMBOL { $$ = lookupType($1); }
 	;
 
-RecordType: RECORD_SYMBOL RecordDecls END_SYMBOL { $$ = 0; }
+RecordType: RECORD_SYMBOL RecordDecls END_SYMBOL { $$ = addRecordType($2); }
 	;
 
-RecordDecls: 
-	| RecordDecls RecordDecl
+RecordDecls: 					{ $$ = -1; }
+	| RecordDecls RecordDecl 	{ $$ = stackRecords($1,$2);}
 	;
 
-RecordDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL
+RecordDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL { $$ = addRecords($1, $3); }
 	;
 
 ArrayType: ARRAY_SYMBOL LBRACKET_SYMBOL Expression COLON_SYMBOL Expression RBRACKET_SYMBOL OF_SYMBOL Type { $$ = addArrayType($3, $5, $8); }
@@ -272,7 +274,7 @@ ReadStatement: READ_SYMBOL LPAREN_SYMBOL LValues RPAREN_SYMBOL	{	$$ = ReadStmt($
 	;
 
 LValues: LValues COMMA_SYMBOL LValue	{ $$ = StackLVal($1, $3); 	}
-	| LValue							{ $$ = NewLValList($1); }
+	| LValue							{ $$ = StackLVal(-1, $1); }
 	;
 
 WriteStatement: WRITE_SYMBOL LPAREN_SYMBOL WriteArgs RPAREN_SYMBOL	{ $$ = WriteStmt($3); }
@@ -321,7 +323,7 @@ Expression: Expression OR_SYMBOL Expression	{$$=OrExpr($1,$3);}
 	;
 
 LValue: IDENT_SYMBOL				{ $$ = LValID($1);}
-	| LValue DOT_SYMBOL IDENT_SYMBOL						{}
+	| LValue DOT_SYMBOL IDENT_SYMBOL						{ $$ = LValMemberAccess($1, $3); }
 	| LValue LBRACKET_SYMBOL Expression RBRACKET_SYMBOL		{ $$ = LValArrayAccess($1, $3); }
 	;
 

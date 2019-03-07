@@ -37,11 +37,20 @@ private:
 
 class MemberLValue : public LValue
 {
-    MemberLValue(LValue base, char* ident, std::shared_ptr<SymbolTable> t): LValue(t){};
+public:
+    MemberLValue(std::shared_ptr<LValue> b, char* ident, std::shared_ptr<SymbolTable> t): LValue(t){
+        id = b->id;
+        base = b;
+        member = std::string(ident);
+        type = std::dynamic_pointer_cast<RecordType>(b->type)->getType(std::string(ident));
+        offset = std::dynamic_pointer_cast<RecordType>(b->type)->getOffset(member);
+    };
     std::string getMemLoc(int r);
     std::string emit() {
         return "";
     }
+    std::string member;
+    int offset;
 };
 
 class ArrayAccessLValue : public LValue

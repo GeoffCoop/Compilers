@@ -1,0 +1,29 @@
+type
+	myInt = integer;
+	myBool = boolean;
+	myChar = char;
+	myArray = array[7:11] of integer;
+var
+    a : myArray;
+	b : integer;
+	n : string;
+begin
+	n := "\n";
+	write(n);
+
+
+$ ARRAY LOGIC
+	b := 7;
+	a[b] := 1;
+	a[8] := 2;
+	a[9] := 3;
+	a[10] := 4;
+	write(a[7]);
+	write(a[8]);
+	write(a[9]);
+	write(a[10]);
+
+	write(n);
+
+
+end.

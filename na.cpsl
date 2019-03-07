@@ -1,9 +1,0 @@
-const 
-	a = 3;
-	b = true;
-	c = "Hello there!";
-	d = 6+a;
-	e = 'e';
-begin
-	write(a);
-end.

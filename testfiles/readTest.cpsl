@@ -1,0 +1,29 @@
+type
+	myArray = array[7:11] of integer;
+	myRec = record
+		a : integer;
+		b : boolean;
+		c : char;
+		m : myArray;
+	end;
+
+var
+    r : myRec;
+	b : integer;
+	n : string;	
+begin
+	n := "\n";
+	write(n);
+
+
+$ READ LOGIC
+	read(r.m[10]);
+	write(r.m[10]);
+	read(r.c);
+	write(r.c);
+
+
+	write(n);
+
+
+end.

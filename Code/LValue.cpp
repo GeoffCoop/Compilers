@@ -1,5 +1,6 @@
 #include "LValue.hpp"
 #include <string>
+#include "Type.hpp"
     
 
 // std::string ArrayAccessLValue::emit(int r) { 
@@ -45,7 +46,11 @@ std::string IDLValue::getMemLoc(int r) {
 }
 
 std::string MemberLValue::getMemLoc(int r) {
-    return "";
+    int memLoc = table->findSymbol(id)->getMemLoc();
+    memLoc+=offset;
+    std::string out = "";
+    out += "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(memLoc) + "\n";
+    return out;
 }
 
  /**
@@ -70,8 +75,8 @@ std::string ArrayAccessLValue::getMemLoc(int r) {
         out += "\tsub \t$t8, $t" + std::to_string(expr->r) + ", $t8\n";
         out += "\tli \t$t9, " + std::to_string(size) + "\n";
         out += "\tmult \t$t8, $t9 \n";
-        out += "\tmflo \t$8\n";
-        out += "\tadd \t$t" + std::to_string(r) + ", $8, $t" + std::to_string(r) + "\n"; 
+        out += "\tmflo \t$t8\n";
+        out += "\tadd \t$t" + std::to_string(r) + ", $t8, $t" + std::to_string(r) + "\n"; 
     }
 
     return out;

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 class Type
 {
@@ -37,7 +38,16 @@ class StringType : public Type
 };
 
 class RecordType : public Type
-{};
+{
+public:
+	void addMember(std::string, std::shared_ptr<Type> );
+	int getOffset(std::string);
+	std::shared_ptr<Type> getType(std::string);
+	std::vector<std::pair<std::string, std::shared_ptr<Type>>> members;
+	std::vector<int> offsetArray;
+	std::string name() { return "record"; }
+	int size();
+};
 
 class ArrayType : public Type
 {	
@@ -52,6 +62,7 @@ public:
 	int upper;
 	std::string name() { return "array"; }
 	int size() { return (upper-lower+1) * type->size(); }
+	
 };
 
 class BuiltInType {

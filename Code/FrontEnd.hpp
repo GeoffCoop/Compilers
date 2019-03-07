@@ -35,7 +35,6 @@
 	int LValID(char*);
 	int LValMemberAccess(int, char*);
 	int LValArrayAccess(int, int);
-	int NewLValList(int);
 	int StackLVal(int, int);
 
 	int NewArgument(int);
@@ -63,4 +62,7 @@
 	int addConst(char*, int);
 	int addType(char*, int);
 	int addArrayType(int, int, int );
+	int addRecordType(int);
+	int addRecords(int, int);
+	int stackRecords(int,int);
 #endif
