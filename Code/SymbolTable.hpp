@@ -17,6 +17,9 @@ public:
 	std::shared_ptr<Type> findType(std::string);
 	int getOffset() { return memoryOffset; }
 	int getLoc() { return memoryLocation; }
+
+	// only for use in For Statement
+	void removeSymbol(std::string key) { m_symbols.erase(key); }
 private:
 	std::shared_ptr<SymbolTable> m_parent;
 	std::map<std::string, std::shared_ptr<Symbol>> m_symbols;

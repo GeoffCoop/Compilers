@@ -19,7 +19,7 @@ begin
 	write(n);
 
 
-$ RECORD LOGIC
+$ RECORD LOGIC			101c999
 	r.a := 10;
 	write(r.a);
 	r.b := true;

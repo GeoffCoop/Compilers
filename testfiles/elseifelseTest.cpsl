@@ -1,0 +1,33 @@
+var
+	a : integer;
+	n : string;	
+
+begin
+	n := "\n";
+	write(n);
+	a := 0;
+
+	repeat
+		a := a + 1;
+		write(a);
+	until a = 5;
+
+	write(n);
+	repeat
+		if a = 5 
+		then
+			a := 4;
+		elseif a = 4
+		then
+			a := 3;
+		elseif a = 3
+		then
+			a := 2;
+		else
+			a := 0;
+		end;
+		write (a);
+	until a = 0;
+
+	write(n);
+end.

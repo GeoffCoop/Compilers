@@ -134,6 +134,9 @@ public:
         //std::vector<std::shared_ptr<Statement>>>>>>
         //    condList;
     //condList conditionalList;
+    std::vector<std::string> statements;
+    std::vector<std::string> statementSequence;
+    std::vector<std::vector<std::pair<int,int>>> elif;
     
 private:
     static std::shared_ptr<FrontEnd> fe;
@@ -145,6 +148,7 @@ private:
 static RegAlloc reg;
 RegAlloc getReg() { return reg; }
 std::shared_ptr<FrontEnd> FrontEnd::fe;
+int _label = 0;
 
 std::string printStringTable(){
     auto st = StringTable::instance()->getTable();
@@ -167,11 +171,11 @@ std::string initMIPS() {
     return s;
 }
 
-void emitMIPS() {
+void emitMIPS(int ss) {
     std::string out;
     out = initMIPS();
     //blocks go here
-    out += FrontEnd::instance()->getCode();
+    out += FrontEnd::instance()->statementSequence[ss];
     // what to do with this?
     out += "\tli \t$v0, 10\n\tsyscall\n";
     out += ".data\n";
@@ -418,11 +422,7 @@ int LValueExpr(int x){ // x is a # in lValue
     auto lval = fe->lValues.get(x);
     //if lValID
     auto sym = fe->getSymbolTable()->findSymbol(lval->id);
-    std::string out = "";
     if (sym->getType()->name() == "string") {
-        //out += "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(sym->getMemLoc()) + "\t #load String var address\n";
-        //out += "\tlw \t$t" + std::to_string(r) + ", STR" + std::to_string(sym->m_value) + "\t # load String\n"; 
-        fe->addCode(out);
         auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r, nullptr, nullptr, ExpressionType::LVAL));
         fe->expressions.get(z)->setValue(sym->m_value);
         return z;
@@ -441,12 +441,11 @@ int LValueExpr(int x){ // x is a # in lValue
         return z;
     }
     else {
-        //auto off = sym->getMemLoc();
-        //std::string out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(off) + "# load memloc \n";
+        std::string out = "";
         out += lval->getMemLoc(r);
         out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
-        fe->addCode(out);
-        auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r, nullptr, nullptr, ExpressionType::LVAL));
+        // fe->addCode(out);
+        auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r, out));
         return z;
     }
 }
@@ -539,66 +538,163 @@ int AssignStmt(int lval, int expr){ // Assign is addi/sw
     
     reg.release(r);
     reg.release(e->r);
-    fe->addCode(out);
-	return 0;
+    fe->statements.emplace_back(out);
+    //fe->addCode(out);
+	return fe->statements.size()-1;
 }
-int MergeConditional(int expr, int stmts){
-//    auto fe = FrontEnd::instance();
-//    auto e = fe->expressions.get(expr);
-//    auto s = fe->slist.get(stmts);
-//    return fe->conditional.add(std::make_shared<std::pair<std::shared_ptr<Expression>, std::vector<std::shared_ptr<Statement>>>>(e,s));
-}
-int IfStmt(int ifList, int elifList, int optElse){
-//    auto fe = FrontEnd::instance();
-//    auto i = fe->conditional.get(ifList);
-//    auto eil = fe->conditionalList.get(elifList);
-//    auto e = fe->slist;
-//    return fe->statements.add(std::make_shared<IfStatement>(i,eil,e));
-}
-int StackElif(int list, int elif){
-//    auto fe = FrontEnd::instance();
-    
-    //new elif list
-/*    if (list == -1){
-        std::vector<std::shared_ptr<std::pair<
-            std::shared_ptr<Expression>,
-            std::vector<std::shared_ptr<Statement>>>>> vec;
-        vec.push_back(fe->conditional.get(elif));
-        return fe->conditionalList.add(std::make_shared<
-            std::vector<std::shared_ptr<std::pair<
-                std::shared_ptr<Expression>,
-                std::vector<std::shared_ptr<Statement>>>>>>
-                (vec));
+int IfStmt(int exp, int iss, int elifList, int optElse){
+    auto fe = FrontEnd::instance();
+    int label = _label++;
+    auto e = fe->expressions.get(exp);
+    auto type = e->type;
+    auto elifs = fe->elif[0];
+    if (elifList != -1) elifs = fe->elif[elifList];
+    std::string out = "";
+    while (type->name() == "array") {
+        type = std::dynamic_pointer_cast<ArrayType>(type)->type;
     }
-    else {
-        auto vec = fe->conditionalList.get(list);
-        vec->push_back(fe->conditional.get(elif));
+    if (type->name() != "bool"){
+        std::cout << "ERROR WHILE TRYING TO EVALUATE IF EXPRESSION. TYPE DID NOT RESOLVE TO TYPE BOOLEAN.";
+    }
+    out += "";
+    out += e->emit();
+    out += "\tbne \t$t" + std::to_string(e->r) + ", $zero, ISS" + std::to_string(label) + "\n";
+    if (elifList != -1) { out += "\tj EI" + std::to_string(label) + "_0\n"; }
+    else {out += "\tj AS" + std::to_string(label) + "\n"; }
+    out += "ISS" + std::to_string(label) + ":\n";
+    out += fe->statementSequence[iss];
+    out += "\tj AI" + std::to_string(label) + "\n";
+
+    if (elifList != -1) {
+        for(int i = 0; i < elifs.size(); i++) {
+            auto ifexp = fe->expressions.get(elifs[i].first);
+            out += "EI" + std::to_string(label) + "_" + std::to_string(i) + ":\n";
+            out += ifexp->emit();
+            out += "\tbne \t$t" + std::to_string(ifexp->r) + ", $zero, EISS" + std::to_string(label) + "_" + std::to_string(i) + "\n";
+            out += "\tj EI" + std::to_string(label) + "_" + std::to_string(i+1) + "\n";
+            out += "EISS" + std::to_string(label) + "_" + std::to_string(i) + ":\n";
+            out += fe->statementSequence[elifs[i].second];
+            out += "\tj AI" + std::to_string(label) + "\n";
+        }
+    }
+    out += "EI" + std::to_string(label) + "_" + std::to_string(elifs.size()) + ":\n";
+    if (optElse != -1) {
+        out += fe->statementSequence[optElse];
+    }
+    out += "\tj AI" + std::to_string(label) + "\n";
+    out += "AI" + std::to_string(label) + ":\n";
+
+    fe->statements.emplace_back(out);
+    return fe->statements.size()-1;
+}
+int StackElif(int list, int exp, int ss){
+    auto fe = FrontEnd::instance();
+    if (list == -1) {
+        auto v = std::vector<std::pair<int,int>>();
+        v.emplace_back(std::pair<int,int> (exp, ss));
+        fe->elif.emplace_back(v);
+        list = fe->elif.size()-1;
         return list;
-    }*/
+    }
+    else   {
+        fe->elif[list].emplace_back(std::pair<int,int>(exp,ss));
+        return list;
+    }
 }
 int WhileStmt(int cond, int stmts){
-//    auto fe = FrontEnd::instance();
-//    auto c = fe->expressions.get(cond);
-//    auto s = fe->slist.get(stmts);
-//    return fe->statements.add(std::make_shared<WhileStatement>(c,s));
+    auto fe = FrontEnd::instance();
+    int label = _label++;
+    auto e = fe->expressions.get(cond);
+    auto type = e->type;
+    while (type->name() == "array") {
+        type = std::dynamic_pointer_cast<ArrayType>(type)->type;
+    }
+    if (type->name() != "bool") {
+        std::cout << "ERROR WHILE TRYING TO EVALUATE WHILE STATE CONDITION. TYPE EVALUATED NOT TO BOOL." << std::endl;
+    }
+    std::string out = "";
+    out += "\tj WCD" + std::to_string(label) + "\n";
+    out += "WCD" + std::to_string(label) + ":\n";
+    out += e->emit();
+    out += "\tbne \t$t" + std::to_string(e->r) + ", $zero, WCNT" + std::to_string(label) + "\n";
+    out += "\tj AW" + std::to_string(label) + "\n";
+    out += "WCNT" + std::to_string(label) + " :\n";
+    out += fe->statementSequence[stmts];
+    out += "\tj WCD" + std::to_string(label) + "\n";
+    out += "AW" + std::to_string(label) + ":\n";
+
+    fe->statements.emplace_back(out);
+    return fe->statements.size()-1;
 }
 int RepeatStmt(int stmts, int cond){
-//    auto fe = FrontEnd::instance();
-//    auto s = fe->slist.get(stmts);
-//    auto c = fe->expressions.get(cond);
-//    return fe->statements.add(std::make_shared<RepeatStatement>(s,c));
+    auto fe = FrontEnd::instance();
+    int label = _label++;
+    auto e = fe->expressions.get(cond);
+    auto type = e->type;
+    while (type->name() == "array") {
+        type = std::dynamic_pointer_cast<ArrayType>(type)->type;
+    }
+    if (type->name() != "bool") {
+        std::cout << "ERROR WHILE TRYING TO EVALUATE REPEAT STATE CONDITION. TYPE NOT EVALUATED TO BOOL." << std::endl;
+    }
+    std::string out = "";
+    out += "\tj RCNT" + std::to_string(label) + "\n";
+    out += "RCD" + std::to_string(label) + ":\n";
+    out += e->emit();
+    out += "\tbeq \t$t" + std::to_string(e->r) + ", $zero, RCNT" + std::to_string(label) + "\n";
+    out += "\tj AR" + std::to_string(label) + "\n";
+    out += "RCNT" + std::to_string(label) + " :\n";
+    out += fe->statementSequence[stmts];
+    out += "\tj RCD" + std::to_string(label) + "\n";
+    out += "AR" + std::to_string(label) + ":\n";
+
+    fe->statements.emplace_back(out);
+    return fe->statements.size()-1;
+}
+void ForAddToST(char* id) {
+    auto fe = FrontEnd::instance();
+    auto st = fe->getSymbolTable();
+    st->addSymbol(id, std::make_shared<VarSymbol>(BuiltInType::getInt(), st->getOffset()));
 }
 int ForStmt(char* id, int begin, bool toDownTo, int end, int stmts){
-//    auto fe = FrontEnd::instance();
-    // these need to pull values from wherever first
-//    auto b = fe->expressions.get(begin);
-//    auto e = fe->expressions.get(end);
-//    auto s = fe->slist.get(stmts);
-//    return fe->statements.add(std::make_shared<ForStatement>(id, b, toDownTo, e, s));
+    auto fe = FrontEnd::instance();
+    auto st = fe->getSymbolTable();
+    auto b = fe->expressions.get(begin);
+    auto e = fe->expressions.get(end);
+    auto l = std::make_shared<IDLValue>(id, BuiltInType::getInt(), st);
+    auto r = reg.getRegister();
+    auto r2 = reg.getRegister();
+    auto label = _label++;
+    std::string out = "";
+    out += b->emit();
+    out += l->getMemLoc(r);
+    out += "\tsw \t$t" + std::to_string(b->r) + ", 0($t" + std::to_string(r) + ")\n"; // id = begin
+    out += "F" + std::to_string(label) + ":\n";
+    out += e->emit();
+    out += l->getMemLoc(r);
+    out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n"; 
+    out += "\tsub \t$t" + std::to_string(e->r) + ", $t" + std::to_string(r) + ", $t" + std::to_string(e->r) + "\n";
+    out += (toDownTo?"\tblez \t$t":"\tbgez \t$t") + std::to_string(e->r) + ", AF" + std::to_string(label) + "\n";
+    out += fe->statementSequence[stmts];
+    out += l->getMemLoc(r);
+    out += "\tlw \t$t" + std::to_string(r2) + ", 0($t" + std::to_string(r) + ")\n";
+    out += "\taddi \t$t" + std::to_string(r2) + ", $t" + std::to_string(r2) + (toDownTo?", -1 \n":", 1 \n");
+    out += "\tsw \t$t" + std::to_string(r2) + ", 0($t" + std::to_string(r) + ")\n";
+    out += "\tj F" + std::to_string(label) + "\n";
+    out += "AF" + std::to_string(label) + ":\n";
+
+    fe->statements.emplace_back(out);   
+    
+    reg.release(r);
+    st->removeSymbol(id);
+    return fe->statements.size()-1;
 }
 int StopStmt(){
-//    auto fe = FrontEnd::instance();
-//    return fe->statements.add(std::make_shared<StopStatement>());
+    auto fe = FrontEnd::instance();
+    std::string out = "";
+    out += "\tli \t$v0, 10\n";
+    out += "\tsyscall\n";
+    fe->addCode(out);
 }
 int ReturnStmt(int expr){
 //    auto fe = FrontEnd::instance();
@@ -612,16 +708,16 @@ int ReturnStmt(int expr){
 int ReadStmt(int lvals){
     auto fe = FrontEnd::instance();
     auto list = fe->lValList.get(lvals);
+    std::string out = "";
     for (int i = 0; i < list->size(); i++) {
         auto type = list->at(i)->type;
-        if (type->name()=="array") {
+        while (type->name()=="array") {
             type = std::dynamic_pointer_cast<ArrayType>(type)->type;
         }
         if (type->name()=="record"){
             auto l = std::dynamic_pointer_cast<MemberLValue>(list->at(i))->member;
             type = std::dynamic_pointer_cast<RecordType>(type)->getType(l);
         }
-        std::string out = "";
         auto r = reg.getRegister();
         out += list->at(i)->getMemLoc(r);
         if (type->name()=="int") {
@@ -634,21 +730,24 @@ int ReadStmt(int lvals){
             out += "\tsyscall # Read Char\n";
             out += "\tsw \t$v0, 0($t" + std::to_string(r) + ")\n";
         }
-        fe->addCode(out);
+        //fe->addCode(out);
+        reg.release(r);
     }
+    fe->statements.emplace_back(out);
+    return fe->statements.size()-1;
 }
 
 int WriteStmt(int argList){
     auto fe = FrontEnd::instance();
     auto list = fe->writeArgs.get(argList);
+    std::string out = "";
     for (int i = 0; i < list->size(); i++){ // for each expression in list
         auto exp = fe->expressions.get(list->at(i));
         auto type = exp->type;
-        if (type->name()=="array") {
+        while (type->name()=="array") {
             type = std::dynamic_pointer_cast<ArrayType>(type)->type;
         }
         auto r = exp->r;
-        std::string out = "";
         out += exp->emit();
 	    if (exp->isLiteral() && (type->name() == "int" || type->name() == "char")) out += "\tli \t$a0, "+ std::to_string(exp->getValue()) + "\n";
         if (type->name() == "int") { 
@@ -674,8 +773,10 @@ int WriteStmt(int argList){
             out += "\tsyscall\n";
         }
         else {} // non-printable type
-        fe->addCode(out);
+        //fe->addCode(out);
     }
+    fe->statements.emplace_back(out);
+    return fe->statements.size()-1;
 
 }
 
@@ -699,10 +800,19 @@ int NewStatementSequence(int stmt){
  //   return fe->slist.add(std::make_shared<std::vector<std::shared_ptr<Statement>>>(vec));
 }
 int StackStatementSequence(int list, int stmt){
- //   auto fe = FrontEnd::instance(); 
-//    auto ss = fe->slist.get(list);
-//    ss->push_back(fe->statements.get(stmt));
-//    return list;
+    auto fe = FrontEnd::instance(); 
+    if (stmt == -1) {
+        return list;
+    }
+    if (list == -1) {
+        fe->statementSequence.emplace_back(fe->statements[stmt]);
+        int z = fe->statementSequence.size() -1;
+        return z;
+    }
+    else {
+        fe->statementSequence[list] += fe->statements[stmt];
+        return list;
+    }
 }
 
 #pragma endregion

@@ -5,7 +5,7 @@
 
 	std::string printStringTable();
 	std::string initMIPS();
-	void emitMIPS();
+	void emitMIPS(int);
 	
 	int StringExpr(char* x);
 	int IntExpr(int x);
@@ -41,11 +41,11 @@
 	int StackArgument(int, int);
 
 	int AssignStmt(int, int);
-	int MergeConditional(int, int);
-	int IfStmt(int, int, int);
-	int StackElif(int, int);
+	int IfStmt(int, int, int, int);
+	int StackElif(int, int, int);
 	int WhileStmt(int, int);
 	int RepeatStmt(int, int);
+	void ForAddToST(char*);
 	int ForStmt(char*, int, bool, int, int);
 	int StopStmt();
 	int ReturnStmt(int);

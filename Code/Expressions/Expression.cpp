@@ -67,6 +67,7 @@ std::string Expression::emit(){ // take a known register/location and do the log
         break;
         case ExpressionType::LVAL : 
             // might do nothing, who knows? But most logic will be done in LValue Print functions
+            out += optCode;
         break;
         // if literal?
         case ExpressionType::CHRCONST : 
@@ -85,6 +86,10 @@ std::string Expression::emit(){ // take a known register/location and do the log
     }
     return out;
 };
+
+std::string LValExpression::emit() {
+    return val;
+}
 
 std::string Literal::emit() {
     std::string out = "";

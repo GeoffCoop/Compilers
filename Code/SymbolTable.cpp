@@ -24,7 +24,6 @@ void SymbolTable::addType(std::string key, std::shared_ptr<Type> type) {
 std::shared_ptr<Symbol> SymbolTable::findSymbol(std::string key){
     auto found = m_symbols.find(key);
     if(found == m_symbols.end()){
-        std::cout << "FINDSYMBOL" << std::endl;
         if (m_parent == nullptr) return nullptr;
         else return m_parent->findSymbol(key);
     }

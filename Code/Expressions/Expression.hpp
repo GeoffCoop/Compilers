@@ -43,6 +43,8 @@ public:
     Expression(){}
     Expression(std::shared_ptr<Type> t, int reg, std::shared_ptr<Expression> c1, std::shared_ptr<Expression> c2, ExpressionType expt): 
         r(reg), type(t), child1(c1), child2(c2), exp(expt) {}
+    Expression(std::shared_ptr<Type> t, int reg, std::string c):
+        r(reg), type(t), optCode(c), exp(ExpressionType::LVAL) {}
     std::shared_ptr<Type> type;
     int getValue() {return value;}
     void setValue(int x) { value = x; }
@@ -54,6 +56,7 @@ protected:
     std::shared_ptr<Expression> child2;
     int value = 0;
     ExpressionType exp;
+    std::string optCode = "";
 };
 
 class Literal : public Expression {
@@ -66,10 +69,14 @@ public:
     bool isLiteral() { return true; }
 };
 
-class MemoryAccess : public Expression {
+class LValExpression : public Expression {
 public:
-    MemoryAccess() {}
-    int offset;
+    LValExpression(std::string access, std::shared_ptr<Type> t, int reg) {
+        val = access;
+        type = t;
+        r = reg;
+    }
+    std::string val;
     std::string emit();
 };
 

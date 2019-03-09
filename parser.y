@@ -111,6 +111,7 @@ void yyerror(const char*);
 %type <int_val> Assignment
 %type <int_val> Statement
 %type <int_val> StatementSequence
+%type <int_val> Block
 
 
 %type <int_val> IdentList
@@ -122,7 +123,7 @@ void yyerror(const char*);
 %type <int_val> Type
 
 %%
-Program: ProgramHead Block DOT_SYMBOL{ emitMIPS(); }
+Program: ProgramHead Block DOT_SYMBOL{ emitMIPS($2); }
 	;
 
 ProgramHead: OptConstDecl OptTypeDecl OptVarDecls PFDecl
@@ -168,8 +169,7 @@ OptVarRef: VAR_SYMBOL {}
 Body: OptConstDecl OptTypeDecl OptVarDecls Block {}
 	;
 
-Block: BEGIN_SYMBOL StatementSequence END_SYMBOL {}
-	;
+Block: BEGIN_SYMBOL StatementSequence END_SYMBOL { $$ = $2; }
 
 OptTypeDecl: TYPE_SYMBOL TypeDecls
 	|
@@ -218,7 +218,7 @@ VarDecls: VarDecl
 VarDecl: IdentList COLON_SYMBOL Type SCOLON_SYMBOL { addVar($1, $3); }
 	;
 
-StatementSequence: Statement 					{ $$ = NewStatementSequence($1); }
+StatementSequence: Statement 					{ $$ = StackStatementSequence(-1, $1); }
 	| StatementSequence SCOLON_SYMBOL Statement	{ $$ = StackStatementSequence($1,$3); }
 	;
 
@@ -238,15 +238,15 @@ Statement: Assignment		{ $$ = $1; }
 Assignment: LValue ASSIGN_SYMBOL Expression { $$ = AssignStmt($1, $3); }
 	;
 
-IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{ $$ = IfStmt(MergeConditional($2,$4),$5, $6); }
+IfStatement: IF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf OptElse END_SYMBOL	{ $$ = IfStmt($2,$4,$5, $6); }
 	;
 
 
-ElseIf: ElseIf ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence	{ $$ = StackElif($1, MergeConditional($3,$5));}
-	|																	{ $$ = -1; } 
+ElseIf: ELSEIF_SYMBOL Expression THEN_SYMBOL StatementSequence ElseIf	{ $$ = StackElif($5, $2, $4);}
+	|																	{ $$ = -1; }
 	;
 
-OptElse: 
+OptElse: 							{ $$ = -1; }
 	| ELSE_SYMBOL StatementSequence { $$ = $2; }
 	;
 
@@ -256,7 +256,7 @@ WhileStatement: WHILE_SYMBOL Expression DO_SYMBOL StatementSequence END_SYMBOL	{
 RepeatStatement: REPEAT_SYMBOL StatementSequence UNTIL_SYMBOL Expression { $$ = RepeatStmt($2, $4); }
 	;
 
-ForStatement: FOR_SYMBOL IDENT_SYMBOL ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL { $$ = ForStmt($2, $4, $5, $6, $8); }
+ForStatement: FOR_SYMBOL IDENT_SYMBOL { ForAddToST($2); } ASSIGN_SYMBOL Expression ToDownTo Expression DO_SYMBOL StatementSequence END_SYMBOL { $$ = ForStmt($2, $5, $6, $7, $9); }
 	;
 
 ToDownTo: TO_SYMBOL	{ $$ = 0; }
