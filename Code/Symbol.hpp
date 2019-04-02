@@ -4,6 +4,8 @@
 #include <string>
 #include "Type.hpp"
 #include <memory>
+#include "FormalDecl.hpp"
+
 class Symbol{
 public:
 	Symbol () {}
@@ -12,22 +14,25 @@ public:
 	// 	type (type),	//type
 	// 	m_memoryLocation(memoryLocation)
 	// 	{}
-	int getMemLoc() { return m_memoryLocation; }
+	int getMemLoc() { return m_offset; }
+	std::string getLoc() { return m_memoryLocation; }
 	std::shared_ptr<Type> getType() { return m_type; }
 	virtual std::string getSub() { return ""; }
 	int m_value = 0;
 protected:
 	std::string id;
 	std::shared_ptr<Type> m_type;
-	int m_memoryLocation;
+	std::string m_memoryLocation;
+	int m_offset;
 };
 
 class VarSymbol: public Symbol {
 public:
-	VarSymbol(std::shared_ptr<Type> type, int memoryLocation)
+	VarSymbol(std::shared_ptr<Type> type, std::string memoryLocation, int offset)
 	{
 		m_type = type;
 		m_memoryLocation = memoryLocation;
+		m_offset = offset;
 	}
 	std::string getSub() { return "Var"; }
 };
@@ -49,6 +54,26 @@ public:
 		m_type = type;
 	}
 	std::string getSub() { return "Type"; }
+};
+
+class ParameterSymbol: public Symbol {
+public:
+	ParameterSymbol(std::shared_ptr<Type> t, std::shared_ptr<FormalDecl> p, int block) {
+		m_type = t;
+		params = p;
+		m_value = block;
+		function = true;
+	}
+	ParameterSymbol(std::shared_ptr<FormalDecl> p, int block) {
+		params = p;
+		m_value = block;
+		function = false;
+	}
+	ParameterSymbol(bool f) : forward(f) {}
+	bool forward = 0;
+	std::shared_ptr<FormalDecl> params;
+	std::string getSub() { return "Parameter"; }
+	bool function;
 };
 
 #endif

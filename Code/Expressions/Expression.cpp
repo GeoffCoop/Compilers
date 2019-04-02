@@ -58,6 +58,7 @@ std::string Expression::emit(){ // take a known register/location and do the log
             out+= "\tsub \t$t" + std::to_string(r) + ", $0, $t" + std::to_string(r) + "\n";
         break;
         case ExpressionType::FUNCCALL : 
+            out += optCode;
         break;
         case ExpressionType::PRED : 
             out+= "\taddi \t$t" + std::to_string(r) + ", $t" + std::to_string(r) + ", -1\n";

@@ -43,8 +43,8 @@ public:
     Expression(){}
     Expression(std::shared_ptr<Type> t, int reg, std::shared_ptr<Expression> c1, std::shared_ptr<Expression> c2, ExpressionType expt): 
         r(reg), type(t), child1(c1), child2(c2), exp(expt) {}
-    Expression(std::shared_ptr<Type> t, int reg, std::string c):
-        r(reg), type(t), optCode(c), exp(ExpressionType::LVAL) {}
+    Expression(std::shared_ptr<Type> t, int reg, std::string c, ExpressionType e):
+        r(reg), type(t), optCode(c), exp(e){}
     std::shared_ptr<Type> type;
     int getValue() {return value;}
     void setValue(int x) { value = x; }

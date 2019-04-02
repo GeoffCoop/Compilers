@@ -6,6 +6,8 @@
 	std::string printStringTable();
 	std::string initMIPS();
 	void emitMIPS(int);
+	void push_ST();
+	void pop_ST();
 	
 	int StringExpr(char* x);
 	int IntExpr(int x);
@@ -38,7 +40,7 @@
 	int StackLVal(int, int);
 
 	int NewArgument(int);
-	int StackArgument(int, int);
+	int StackArguments(int, int);
 
 	int AssignStmt(int, int);
 	int IfStmt(int, int, int, int);
@@ -53,7 +55,6 @@
 	int WriteStmt(int);
 	int StackWriteArgs(int, int);
 	int ProcCall(char*, int);
-	int NewStatementSequence(int);
 	int StackStatementSequence(int, int);
 	
 	int stackIdentList(int, char*);	
@@ -65,4 +66,10 @@
 	int addRecordType(int);
 	int addRecords(int, int);
 	int stackRecords(int,int);
+	int addParameter(int, int, int);
+	int stackParameters(int, int);
+	void addProcedure(char*, int, int);
+	char* linkProcedure(char*);
+	char* linkFunction(char*);
+	void addFunction(char*, int, int, int);
 #endif

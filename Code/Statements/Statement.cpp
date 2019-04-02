@@ -4,8 +4,6 @@ std::string Statement::emit(int r) {
     std::string out = "";
     switch (stype){
         case StatementType::ASSIGN :
-            // out = "\taddi \t$t" + std::to_string(r) + ", $gp, " + std::to_string(sym->getMemLoc()) + "\n";
-            // out += "\tsw \t$t" + std::to_string(e->r) + ", 0($t" + std::to_string(r) + ")\n";
         break;
         case StatementType::IF :
         break;

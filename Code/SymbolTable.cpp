@@ -8,7 +8,28 @@ void SymbolTable::addSymbol (std::string key, std::shared_ptr<Symbol> symbol){
         m_symbols[key] = symbol;
     }
 //    if(typeid(symbol) != typeid(findEntry("integer")))
+    if (symbol->getSub() != "Parameter" && symbol->getSub() != "Const") {
         memoryOffset += symbol->getType()->size();
+    }
+}
+
+void SymbolTable::modSymbol (std::string key, std::shared_ptr<Symbol> symbol){
+    auto found = m_symbols.find(key);
+    if (found != m_symbols.end()) {
+        m_symbols[key] = symbol;
+    }
+    else {
+        m_parent->modSymbol(key, symbol);
+    }
+}
+void SymbolTable::addParam (std::string key, std::shared_ptr<Symbol> symbol){
+    auto found = m_symbols.find(key);
+    if (found == m_symbols.end()){
+        m_symbols[key] = symbol;
+    }
+    if (symbol->getSub() != "Const") {
+        paramOffset += symbol->getType()->size();
+    }
 }
 
 void SymbolTable::addType(std::string key, std::shared_ptr<Type> type) {
