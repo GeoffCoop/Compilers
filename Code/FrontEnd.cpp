@@ -726,7 +726,7 @@ int ForStmt(char* id, int begin, bool toDownTo, int end, int stmts){
     out += l->getMemLoc(r);
     out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n"; 
     out += "\tsub \t$t" + std::to_string(e->r) + ", $t" + std::to_string(r) + ", $t" + std::to_string(e->r) + "\n";
-    out += (toDownTo?"\tblez \t$t":"\tbgez \t$t") + std::to_string(e->r) + ", AF" + std::to_string(label) + "\n";
+    out += (toDownTo?"\tbltz \t$t":"\tbgtz \t$t") + std::to_string(e->r) + ", AF" + std::to_string(label) + "\n";
     out += fe->statementSequence[stmts];
     out += l->getMemLoc(r);
     out += "\tlw \t$t" + std::to_string(r2) + ", 0($t" + std::to_string(r) + ")\n";
