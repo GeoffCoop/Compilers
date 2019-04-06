@@ -746,7 +746,8 @@ int StopStmt(){
     std::string out = "";
     out += "\tli \t$v0, 10\n";
     out += "\tsyscall\n";
-    fe->addCode(out);
+    fe->statements.emplace_back(out);
+    return fe->statements.size()-1;
 }
 int ReturnStmt(int expr){
    auto fe = FrontEnd::instance();
