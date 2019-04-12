@@ -20,6 +20,9 @@ std::string IDLValue::getMemLoc(int r) {
         memLoc += 4;
     }
     out += "\taddi \t$t" + std::to_string(r) + loc + std::to_string(memLoc) + "\n";
+    if (type->name() == "reference") {
+        out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n";
+    }
     return out;
 }
 
@@ -41,6 +44,9 @@ std::string MemberLValue::getMemLoc(int r) {
         memLoc += 4;
     }
     out += "\taddi \t$t" + std::to_string(r) + loc + std::to_string(memLoc) + "\n";
+    if (type->name() == "reference") {
+        out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n";
+    }
     return out;
 }
 
@@ -50,8 +56,12 @@ std::string MemberLValue::getMemLoc(int r) {
 std::string ArrayAccessLValue::getMemLoc(int r) {
     int memLoc = table->findSymbol(id)->getMemLoc();
     auto sym = table->findSymbol(id);
-    int lower = std::dynamic_pointer_cast<ArrayType>(type)->lower;
-    int size = std::dynamic_pointer_cast<ArrayType>(type)->type->size();
+    auto t = type;
+    while (t->name() == "reference") {
+        t = std::dynamic_pointer_cast<ReferenceType>(t)->type;
+    }
+    int lower = std::dynamic_pointer_cast<ArrayType>(t)->lower;
+    int size = std::dynamic_pointer_cast<ArrayType>(t)->type->size();
     std::string out = "";
     std::string loc = "";
     if (sym->getLoc() == "$gp") {
@@ -74,6 +84,9 @@ std::string ArrayAccessLValue::getMemLoc(int r) {
     else {
         out += "\taddi \t$t" + std::to_string(r) + loc + std::to_string(memLoc) + "\n";
         out += "\tli \t$t8, " + std::to_string(lower) + "\n";
+        if (type->name() == "reference") {
+            out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n";
+        }
         out += expr->emit();
         out += "\tsub \t$t8, $t" + std::to_string(expr->r) + ", $t8\n";
         out += "\tli \t$t9, " + std::to_string(size) + "\n";

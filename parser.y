@@ -82,7 +82,8 @@ void yyerror(const char*);
 %left AND_SYMBOL OR_SYMBOL
 %right NOT_SYMBOL
 %nonassoc EQUAL_SYMBOL NOTEQUAL_SYMBOL LT_SYMBOL LTE_SYMBOL GT_SYMBOL GTE_SYMBOL
-%left PLUS_SYMBOL MINUS_SYMBOL MULT_SYMBOL DIV_SYMBOL MODULO_SYMBOL
+%left PLUS_SYMBOL MINUS_SYMBOL
+%left MULT_SYMBOL DIV_SYMBOL MODULO_SYMBOL
 %right UNARYMINUS_SYMBOL
 
 %type <char_val> CHRCONST_SYMBOL
@@ -95,6 +96,8 @@ void yyerror(const char*);
 %type <int_val> Arguments
 %type <int_val> LValue
 %type <int_val> ProcedureCall
+%type <str_val> Procedure
+%type <str_val> Function
 %type <int_val> WriteArgs
 %type <int_val>	WriteStatement
 %type <int_val> LValues
@@ -121,6 +124,10 @@ void yyerror(const char*);
 %type <int_val> RecordDecl
 %type <int_val> RecordDecls
 %type <int_val> Type
+%type <int_val> OptVarRef
+%type <int_val> FormalParameter
+%type <int_val> FormalParameters
+%type <int_val> Body
 
 %%
 Program: ProgramHead Block DOT_SYMBOL{ emitMIPS($2); }
@@ -145,28 +152,33 @@ PFDecl: PFDecl ProcedureDecl
 	|
 	;
 
-ProcedureDecl: PROCEDURE_SYMBOL IDENT_SYMBOL LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL SCOLON_SYMBOL FORWARD_SYMBOL SCOLON_SYMBOL {}
-	| PROCEDURE_SYMBOL IDENT_SYMBOL LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL SCOLON_SYMBOL Body SCOLON_SYMBOL
+Procedure: PROCEDURE_SYMBOL IDENT_SYMBOL { $$ = linkProcedure($2); }
 	;
 
-FormalParameters: {}
-	| FormalParameters SCOLON_SYMBOL FormalParameter {}
-	| FormalParameter	{}
+ProcedureDecl: Procedure LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL SCOLON_SYMBOL FORWARD_SYMBOL SCOLON_SYMBOL { addProcedure($1, $3, -1); }
+	|  Procedure LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL SCOLON_SYMBOL Body SCOLON_SYMBOL					 { addProcedure($1, $3, $6); }
 	;
 
-FormalParameter: OptVarRef IdentList COLON_SYMBOL Type {}
+FormalParameters: 										{ $$ = -1; }
+	| FormalParameters SCOLON_SYMBOL FormalParameter 	{ $$ = stackParameters($1, $3); }
+	| FormalParameter									{ $$ = stackParameters(-1, $1); }
 	;
 
-FunctionDecl: FUNCTION_SYMBOL IDENT_SYMBOL LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL COLON_SYMBOL Type SCOLON_SYMBOL FORWARD_SYMBOL SCOLON_SYMBOL
-	| FUNCTION_SYMBOL IDENT_SYMBOL LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL COLON_SYMBOL Type SCOLON_SYMBOL Body SCOLON_SYMBOL
+FormalParameter: OptVarRef IdentList COLON_SYMBOL Type 	{ $$ = addParameter($2, $4, $1); }
 	;
 
-OptVarRef: VAR_SYMBOL {}
-	| REF_SYMBOL {}
-	| {}
+Function: FUNCTION_SYMBOL IDENT_SYMBOL { $$ = linkFunction($2); }
+
+FunctionDecl: Function LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL COLON_SYMBOL Type SCOLON_SYMBOL FORWARD_SYMBOL SCOLON_SYMBOL 	{ addFunction($1, $3, $6, -1); }
+	| Function LPAREN_SYMBOL FormalParameters RPAREN_SYMBOL COLON_SYMBOL Type SCOLON_SYMBOL Body SCOLON_SYMBOL	{ addFunction($1, $3, $6, $8); }
+	;
+
+OptVarRef: VAR_SYMBOL { $$ = 0; }
+	| REF_SYMBOL { $$ = 1;}
+	| { $$ = 0; }
 	; 
 
-Body: OptConstDecl OptTypeDecl OptVarDecls Block {}
+Body: OptConstDecl OptTypeDecl OptVarDecls Block { $$ = $4; }
 	;
 
 Block: BEGIN_SYMBOL StatementSequence END_SYMBOL { $$ = $2; }
@@ -284,11 +296,11 @@ WriteArgs: WriteArgs COMMA_SYMBOL Expression	{ $$ = StackWriteArgs($1, $3); }
 	| Expression								{ $$ = StackWriteArgs(-1, $1); }
 	;
 
-Arguments: Arguments COMMA_SYMBOL Expression 	{ }
-	| Expression								{}
+Arguments: Arguments COMMA_SYMBOL Expression 	{ $$ = StackArguments($1, $3); }
+	| Expression								{ $$ = StackArguments(-1, $1); }
 	;
 
-ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ }
+ProcedureCall: IDENT_SYMBOL LPAREN_SYMBOL OptArguments RPAREN_SYMBOL	{ $$ = ProcCall($1, $3); }
 	;
 
 OptArguments: 	{$$ = -1;}

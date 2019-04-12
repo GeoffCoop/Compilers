@@ -42,8 +42,15 @@ public:
         id = b->id;
         base = b;
         member = std::string(ident);
-        type = std::dynamic_pointer_cast<RecordType>(b->type)->getType(std::string(ident));
-        offset = std::dynamic_pointer_cast<RecordType>(b->type)->getOffset(member);
+        if (base->type->name() == "array") {
+
+            type = std::dynamic_pointer_cast<RecordType>(std::dynamic_pointer_cast<ArrayType>(b->type)->type)->getType(std::string(ident));
+            offset = std::dynamic_pointer_cast<RecordType>(std::dynamic_pointer_cast<ArrayType>(b->type)->type)->getOffset(member);
+        }
+        else {
+            type = std::dynamic_pointer_cast<RecordType>(b->type)->getType(std::string(ident));
+            offset = std::dynamic_pointer_cast<RecordType>(b->type)->getOffset(member);
+        }
     };
     std::string getMemLoc(int r);
     std::string emit() {

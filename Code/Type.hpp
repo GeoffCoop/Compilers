@@ -73,4 +73,13 @@ public:
 	static std::shared_ptr<Type> getString() { return std::make_shared<StringType>(); };
 };
 
+class ReferenceType : public Type 
+{
+	public:
+	ReferenceType(std::shared_ptr<Type> t): type(t){}
+	std::shared_ptr<Type> type;
+	std::string name() { return "reference"; }
+	int size() { return 4; }
+};
+
 #endif

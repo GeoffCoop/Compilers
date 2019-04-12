@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <functional>
 
 #include "StringTable.hpp"
 #include "SymbolTable.hpp"
@@ -15,42 +16,6 @@
 #include "RegAllocation.hpp"
 #include "Type.hpp"
 #include "FormalDecl.hpp"
-
-//#include "Expressions/stringExpression.hpp"
-//#include "Expressions/intExpression.hpp"
-//#include "Expressions/charExpression.hpp"
-//#include "Expressions/add.hpp"
-//#include "Expressions/and.hpp"
-//#include "Expressions/chr.hpp"
-//#include "Expressions/div.hpp"
-//#include "Expressions/eq.hpp"
-//#include "Expressions/functionCall.hpp"
-//#include "Expressions/gt.hpp"
-//#include "Expressions/gte.hpp"
-//#include "Expressions/lt.hpp"
-//#include "Expressions/lte.hpp"
-//// #include "Expressions/lvalueexpr.hpp"
-//#include "Expressions/mod.hpp"
-//#include "Expressions/mult.hpp"
-//#include "Expressions/ne.hpp"
-//#include "Expressions/not.hpp"
-//#include "Expressions/or.hpp"
-//#include "Expressions/ord.hpp"
-//#include "Expressions/pred.hpp"
-//#include "Expressions/sub.hpp"
-//#include "Expressions/succ.hpp"
-//#include "Expressions/umin.hpp"
-
-// #include "Statements/AssignStatement.hpp"
-// #include "Statements/ForStatement.hpp"
-// #include "Statements/IfStatement.hpp"
-// #include "Statements/ProcCall.hpp"
-// #include "Statements/ReadStatement.hpp"
-// #include "Statements/RepeatStatement.hpp"
-// #include "Statements/ReturnStatement.hpp"
-// #include "Statements/StopStatement.hpp"
-// #include "Statements/WhileStatement.hpp"
-// #include "Statements/WriteStatement.hpp"
 
 template <typename T>
 class NodeList
@@ -137,8 +102,8 @@ private:
     std::string code = "";
 };
 
-static RegAlloc reg;
-RegAlloc getReg() { return reg; }
+std::shared_ptr<RegAlloc> RegAlloc::r;
+auto reg = RegAlloc::instance();
 std::shared_ptr<FrontEnd> FrontEnd::fe;
 int _label = 0;
 int _block = 0;
@@ -192,263 +157,267 @@ void pop_ST() {
 
 #pragma region Expressions
 int StringExpr(char* x){
-    auto exp = std::make_shared<Literal>(x, reg.getRegister());
+    auto exp = std::make_shared<Literal>(x);
     auto l = FrontEnd::instance()->expressions.add(exp); 
     return l;
 }
 int IntExpr(int x){ 
-    auto exp = std::make_shared<Literal>(x, reg.getRegister());
+    auto exp = std::make_shared<Literal>(x);
     auto l = FrontEnd::instance()->expressions.add(exp);
     return l;
 }
 int CharExpr(char x){ 
-    auto exp = std::make_shared<Literal>(x, reg.getRegister());
+    auto exp = std::make_shared<Literal>(x);
     auto l = FrontEnd::instance()->expressions.add(exp);
     return l;
 }
 // The following need to retrieve other expressions first
 int SuccExpr(int x){
     auto exp = FrontEnd::instance()->expressions.get(x);
-    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(exp->type, exp->r, exp, nullptr, ExpressionType::SUCC));
+    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(exp->type, exp, nullptr, ExpressionType::SUCC));
     return z;
 }
 int PredExpr(int x){
     auto exp = FrontEnd::instance()->expressions.get(x);
-    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(exp->type, exp->r, exp, nullptr, ExpressionType::PRED));
+    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(exp->type, exp, nullptr, ExpressionType::PRED));
     return z;
 }
 int ChrExpr(int x){
     auto fe = FrontEnd::instance();
     auto exp = fe->expressions.get(x);
-    return fe->expressions.add(std::make_shared<Expression>(BuiltInType::getChar(), exp->r, exp, nullptr, ExpressionType::CHR));
+    return fe->expressions.add(std::make_shared<Expression>(BuiltInType::getChar(), exp, nullptr, ExpressionType::CHR));
     
 }
 int OrdExpr(int x){
     auto fe = FrontEnd::instance();
     auto exp = fe->expressions.get(x);
-    return fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), exp->r, exp, nullptr, ExpressionType::ORD));
+    return fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), exp, nullptr, ExpressionType::ORD));
     
 }
 int UMinusExpr(int x){
     auto exp = FrontEnd::instance()->expressions.get(x);
-    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), exp->r, exp, nullptr, ExpressionType::UMIN));
+    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), exp, nullptr, ExpressionType::UMIN));
     return z;
 }
 int NotExpr(int x){
     auto exp = FrontEnd::instance()->expressions.get(x);
-    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), exp->r, exp, nullptr, ExpressionType::NOT));
+    auto z = FrontEnd::instance()->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), exp, nullptr, ExpressionType::NOT));
     return z;
 }
 //////////////////////////////// Need to grab both expressions from list
 int ModExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
+    // reg->release(expx->r);
+    // reg->release(expy->r);
 
     if (fe->expressions.get(x)->isLiteral() && fe->expressions.get(y)->isLiteral()) {
         auto val = fe->expressions.get(x)->getValue() % fe->expressions.get(y)->getValue();
-        auto z = fe->expressions.add(std::make_shared<Literal>(val, r));
+        auto z = fe->expressions.add(std::make_shared<Literal>(val));
         return z;
     }
     else {
-        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r, expx, expy, ExpressionType::MODULO));
+        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), expx, expy, ExpressionType::MODULO));
         return z;
     }
 }
 int DivExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
+    // reg->release(expx->r);
+    // reg->release(expy->r);
 
     if (fe->expressions.get(x)->isLiteral() && fe->expressions.get(y)->isLiteral()) {
         auto val = fe->expressions.get(x)->getValue() / fe->expressions.get(y)->getValue();
-        auto z = fe->expressions.add(std::make_shared<Literal>(val, r));
+        auto z = fe->expressions.add(std::make_shared<Literal>(val));
         return z;
     }
     else {
-        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r, expx, expy, ExpressionType::DIV));
+        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), expx, expy, ExpressionType::DIV));
         return z;
     }
 }
 int MultExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
+    // reg->release(expx->r);
+    // reg->release(expy->r);
     
     if (fe->expressions.get(x)->isLiteral() && fe->expressions.get(y)->isLiteral()) {
         auto val = fe->expressions.get(x)->getValue() * fe->expressions.get(y)->getValue();
-        auto z = fe->expressions.add(std::make_shared<Literal>(val, r));
+        auto z = fe->expressions.add(std::make_shared<Literal>(val));
         return z;
     }
     else {
-        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r, expx, expy, ExpressionType::MULT));
+        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), expx, expy, ExpressionType::MULT));
         return z;
     }
 }
 int MinExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
+    // reg->release(expx->r);
+    // reg->release(expy->r);
     
     if (fe->expressions.get(x)->isLiteral() && fe->expressions.get(y)->isLiteral()) {
         auto val = fe->expressions.get(x)->getValue() - fe->expressions.get(y)->getValue();
-        auto z = fe->expressions.add(std::make_shared<Literal>(val, r));
+        auto z = fe->expressions.add(std::make_shared<Literal>(val));
         return z;
     }
     else {
-        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r, expx, expy, ExpressionType::MINUS));
+        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), expx, expy, ExpressionType::MINUS));
         return z;
     }
 }
 int PlusExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
+    // reg->release(expx->r);
+    // reg->release(expy->r);
     
     // TODO: Maybe refactor this part? Idk, it might work, it might not...
     if (fe->expressions.get(x)->isLiteral() && fe->expressions.get(y)->isLiteral()) {
         auto val = fe->expressions.get(x)->getValue() + fe->expressions.get(y)->getValue();
-        auto z = fe->expressions.add(std::make_shared<Literal>(val, r));
+        auto z = fe->expressions.add(std::make_shared<Literal>(val));
         return z;
     }
     else {
-        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), r, expx, expy, ExpressionType::PLUS));
+        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getInt(), expx, expy, ExpressionType::PLUS));
         return z;
     }
 }
 int GTExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
+    // reg->release(expx->r);
+    // reg->release(expy->r);
 
     if (fe->expressions.get(x)->isLiteral() && fe->expressions.get(y)->isLiteral()) {
         auto val = fe->expressions.get(x)->getValue() >= fe->expressions.get(y)->getValue();
-        auto z = fe->expressions.add(std::make_shared<Literal>(val, r));
+        auto z = fe->expressions.add(std::make_shared<Literal>(val));
         return z;
     }
     else {
-        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::GT));
+        auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::GT));
         return z;
     }
 }
 int LTExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::LT));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::LT));
     return z;
 }
 int GTEExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::GTE));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::GTE));
     return z;
 }
 int LTEExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::LTE));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::LTE));
     return z;
 }
 int NEExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::NOTEQUAL));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::NOTEQUAL));
     return z;
 }
 int EQExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::EQUAL));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::EQUAL));
     return z;
 }
 int AndExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::AND));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::AND));
     return z;
 }
 int OrExpr(int x, int y){
     auto fe = FrontEnd::instance();
-    int r = reg.getRegister();
+    // int r = reg->getRegister();
     auto expx = fe->expressions.get(x);
     auto expy = fe->expressions.get(y);
-    reg.release(expx->r);
-    reg.release(expy->r);
-    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), r, expx, expy, ExpressionType::OR));
+    // reg->release(expx->r);
+    // reg->release(expy->r);
+    auto z = fe->expressions.add(std::make_shared<Expression>(BuiltInType::getBoolean(), expx, expy, ExpressionType::OR));
     return z;
 }
 int LValueExpr(int x){ // x is a # in lValue
     auto fe = FrontEnd::instance();
-    auto r = reg.getRegister();
+    // auto r = reg->getRegister();
     auto lval = fe->lValues.get(x);
     //if lValID
     auto sym = fe->getSymbolTable()->findSymbol(lval->id);
     if (sym->getType()->name() == "string") {
-        auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r, nullptr, nullptr, ExpressionType::LVAL));
+        auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, nullptr, nullptr, ExpressionType::LVAL));
         fe->expressions.get(z)->setValue(sym->m_value);
         return z;
     }
     else if (sym->getSub() == "Const") {
         int z = -1;
         if (sym->getType()->name() == "bool"){
-            z = fe->expressions.add(std::make_shared<Literal>(static_cast<bool>(sym->m_value), r));
+            z = fe->expressions.add(std::make_shared<Literal>(static_cast<bool>(sym->m_value)));
         }
         else if (sym->getType()->name() == "char") {
-            z = fe->expressions.add(std::make_shared<Literal>(static_cast<char>(sym->m_value), r));
+            z = fe->expressions.add(std::make_shared<Literal>(static_cast<char>(sym->m_value)));
         }
         else {
-            z = fe->expressions.add(std::make_shared<Literal>(sym->m_value, r));
+            z = fe->expressions.add(std::make_shared<Literal>(sym->m_value));
         }
         return z;
     }
+    // else if (sym->getType()->name() == "reference"){
+        
+    // }
     else {
-        std::string out = "";
-        out += lval->getMemLoc(r);
-        out += "\tlw \t$t" + std::to_string(r) + ", 0($t" + std::to_string(r) + ")\n" ;
         // fe->addCode(out);
-        auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, r, out, ExpressionType::LVAL));
+        auto z = fe->expressions.add(std::make_shared<Expression>(lval->type, [lval](int r)->std::string{
+            std::string out = "";
+            out += lval->getMemLoc(r);
+            return out;
+        }, ExpressionType::LVAL));
         return z;
     }
 }
@@ -456,9 +425,7 @@ int LValueExpr(int x){ // x is a # in lValue
 int CallFunction(char* id, int argList){
     auto fe = FrontEnd::instance();
     auto st = fe->getSymbolTable();
-    auto r = reg.getRegister();
     auto params = st->findSymbol(id);
-    auto argsoff = 0;
     if (params->getSub() != "Parameter") {
         std::cout << "ERROR: this is not a function." << std::endl;
         return EXIT_FAILURE;
@@ -468,43 +435,60 @@ int CallFunction(char* id, int argList){
     // std::cout << fd->params.size() << std::endl;
     auto ps = fd->params;
     auto args = fe->arguments.get(argList);
+    if (argList == -1) {
+        args = std::make_shared<std::vector<std::shared_ptr<Expression>>>();
+    }
     if (ps.size() != args->size()) {
         std::cout << "ERROR: function contains an improper number of arguments. Expected " + std::to_string(ps.size()) + " but got " + std::to_string(args->size()) << std::endl;
         return EXIT_FAILURE;
     }
-    std::string out = "";
-    // check args match params
-    out += "\tsw \t$ra, -4($sp)\n";
-    out += "\tsw \t$fp, -8($sp)\n";
-    out += "\taddi \t$sp, $sp, -8\n";
-    // load parameters
-    for (int i = 0; i < args->size(); i++) {
-        if (args->at(i)->type->name() != ps[i]->type->name()){
-            std::cout << "ERROR: expected type " + ps[i]->type->name() + " but got " + args->at(i)->type->name();
-            return EXIT_FAILURE;
+
+    auto z = fe->expressions.add(std::make_shared<Expression>(psym->getType(), [args, ps, params](int r)-> std::string {
+        auto argsoff = 0;
+        std::string out = "";
+        out += "\tsw \t$ra, -4($sp)\n";
+        out += "\tsw \t$fp, -8($sp)\n";
+        out += "\taddi \t$sp, $sp, -8\n";
+        for (int i = 0; i < args->size(); i++) {
+            auto t = args->at(i)->type;
+            auto pt = ps[i]->type;
+            while (t->name() == "reference"){
+                t = std::dynamic_pointer_cast<ReferenceType>(t)->type;
+            }
+            while (pt->name() == "reference"){
+                pt = std::dynamic_pointer_cast<ReferenceType>(pt)->type;
+            }
+            while(t->name() == "array" && pt->name() != "array"){
+                t = std::dynamic_pointer_cast<ArrayType>(t)->type;
+            }
+            if (t->name() != pt->name()){
+                std::cout << "ERROR: expected type " + pt->name() + " but got " + t->name();
+            }
+            if (ps[i]->type->name() == "reference"){
+            if(args->at(i)->exp == ExpressionType::LVAL){
+                auto r = RegAlloc::instance()->getRegister();
+                out += args->at(i)->optCode(r);
+                argsoff += ps[i]->type->size();
+                out += "\tsw \t$t" + std::to_string(r) + ", -" + std::to_string(argsoff) + "($sp)\n";
+                RegAlloc::instance()->release(r);
+            }
         }
-        out += args->at(i)->emit();
-        argsoff += args->at(i)->type->size();
-        out += "\tsw \t$t" + std::to_string(args->at(i)->r) + ", -" + std::to_string(argsoff) + "($sp)\n";
-    }
-
-    // fp = sp, sp = args offset
-    out += "\tmove \t$fp, $sp\n";
-    out += "\taddi \t$sp, $sp, -" + std::to_string(argsoff) + "\n";
-    // jal
-    out += "\tjal BLOCK" + std::to_string(params->m_value) + "\n";
-    // sp <- args offset
-    out += "\taddi \t$sp, $sp, " + std::to_string(argsoff) + "\n";
-    // sp <- -8
-    out += "\taddi \t$sp, $sp, 8\n";
-    // grab old fp and ra
-    out += "\tlw \t$ra, -4($sp)\n";
-    out += "\tlw \t$fp, -8($sp)\n";
-    // difference here between Procedure and Function
-    out += "\tmove \t$t" + std::to_string(r) + ", $v0\n";
-    // weird stuff with addi sp, sp, 0
-
-    auto z = fe->expressions.add(std::make_shared<Expression>(psym->getType(), r, out, ExpressionType::FUNCCALL));
+        else{
+            out += args->at(i)->emit();
+            argsoff += args->at(i)->type->size();
+            out += "\tsw \t$t" + std::to_string(args->at(i)->r) + ", -" + std::to_string(argsoff) + "($sp)\n";
+        }
+        }
+        out += "\tmove \t$fp, $sp\n";
+        out += "\taddi \t$sp, $sp, -" + std::to_string(argsoff) + "\n";
+        out += "\tjal BLOCK" + std::to_string(params->m_value) + "\n";
+        out += "\taddi \t$sp, $sp, " + std::to_string(argsoff) + "\n";
+        out += "\taddi \t$sp, $sp, 8\n";
+        out += "\tlw \t$ra, -4($sp)\n";
+        out += "\tlw \t$fp, -8($sp)\n";
+        out += "\tmove \t$t" + std::to_string(r) + ", $v0\n";
+        return out;
+    }, ExpressionType::FUNCCALL));
     return z;
 }
 
@@ -527,7 +511,12 @@ int LValID(char* id){
 int LValMemberAccess(int base, char* ident){
     auto fe = FrontEnd::instance();
     auto b = fe->lValues.get(base);
-    if (b->type->name() != "record") {
+    if (b->type->name() == "array") {
+        if(std::dynamic_pointer_cast<ArrayType>(b->type)->type->name() != "record") {
+            std::cout << "ERROR: THIS VARIABLE IS NOT A RECORD." << std::endl;
+        }
+    }
+    else if (b->type->name() != "record") {
         std::cout << "ERROR: THIS VARIABLE IS NOT A RECORD." << std::endl;
         return -1;
     }
@@ -573,7 +562,7 @@ int AssignStmt(int lval, int expr){ // Assign is addi/sw
     auto l = fe->lValues.get(lval);
 	// if const, throw error
 
-    auto r = reg.getRegister();
+    auto r = reg->getRegister();
     auto e = fe->expressions.get(expr);
     auto sym = fe->getSymbolTable()->findSymbol(l->id);
     std::string out = "";
@@ -583,13 +572,12 @@ int AssignStmt(int lval, int expr){ // Assign is addi/sw
     }
     else {
     // does not take into consideration type or location
-        out += e->emit();
         out += l->getMemLoc(r);
+        out += e->emit();
         out += "\tsw \t$t" + std::to_string(e->r) + ", 0($t" + std::to_string(r) + ")\n";
     }
     
-    reg.release(r);
-    reg.release(e->r);
+    reg->release(r);
     fe->statements.emplace_back(out);
     //fe->addCode(out);
 	return fe->statements.size()-1;
@@ -599,8 +587,10 @@ int IfStmt(int exp, int iss, int elifList, int optElse){
     int label = _label++;
     auto e = fe->expressions.get(exp);
     auto type = e->type;
-    auto elifs = fe->elif[0];
-    if (elifList != -1) elifs = fe->elif[elifList];
+    std::vector<std::pair<int,int>> elifs;
+    if (elifList != -1) {
+        elifs = fe->elif[elifList];
+    }
     std::string out = "";
     while (type->name() == "array") {
         type = std::dynamic_pointer_cast<ArrayType>(type)->type;
@@ -612,7 +602,7 @@ int IfStmt(int exp, int iss, int elifList, int optElse){
     out += e->emit();
     out += "\tbne \t$t" + std::to_string(e->r) + ", $zero, ISS" + std::to_string(label) + "\n";
     if (elifList != -1) { out += "\tj EI" + std::to_string(label) + "_0\n"; }
-    else {out += "\tj AS" + std::to_string(label) + "\n"; }
+    else {out += "\tj AI" + std::to_string(label) + "\n"; }
     out += "ISS" + std::to_string(label) + ":\n";
     out += fe->statementSequence[iss];
     out += "\tj AI" + std::to_string(label) + "\n";
@@ -714,8 +704,8 @@ int ForStmt(char* id, int begin, bool toDownTo, int end, int stmts){
     auto b = fe->expressions.get(begin);
     auto e = fe->expressions.get(end);
     auto l = std::make_shared<IDLValue>(id, BuiltInType::getInt(), st);
-    auto r = reg.getRegister();
-    auto r2 = reg.getRegister();
+    auto r = reg->getRegister();
+    auto r2 = reg->getRegister();
     auto label = _label++;
     std::string out = "";
     out += b->emit();
@@ -737,7 +727,8 @@ int ForStmt(char* id, int begin, bool toDownTo, int end, int stmts){
 
     fe->statements.emplace_back(out);   
     
-    reg.release(r);
+    reg->release(r);
+    reg->release(r2);
     st->removeSymbol(id);
     return fe->statements.size()-1;
 }
@@ -775,7 +766,7 @@ int ReadStmt(int lvals){
             auto l = std::dynamic_pointer_cast<MemberLValue>(list->at(i))->member;
             type = std::dynamic_pointer_cast<RecordType>(type)->getType(l);
         }
-        auto r = reg.getRegister();
+        auto r = reg->getRegister();
         out += list->at(i)->getMemLoc(r);
         if (type->name()=="int") {
             out += "\tli \t$v0, 5\n";
@@ -788,7 +779,7 @@ int ReadStmt(int lvals){
             out += "\tsw \t$v0, 0($t" + std::to_string(r) + ")\n";
         }
         //fe->addCode(out);
-        reg.release(r);
+        reg->release(r);
     }
     fe->statements.emplace_back(out);
     return fe->statements.size()-1;
@@ -801,11 +792,14 @@ int WriteStmt(int argList){
     for (int i = 0; i < list->size(); i++){ // for each expression in list
         auto exp = fe->expressions.get(list->at(i));
         auto type = exp->type;
+        while (type->name() == "reference") {
+            type = std::dynamic_pointer_cast<ReferenceType>(type)->type;
+        }
         while (type->name()=="array") {
             type = std::dynamic_pointer_cast<ArrayType>(type)->type;
         }
-        auto r = exp->r;
         out += exp->emit();
+        auto r = exp->r;
 	    if (exp->isLiteral() && (type->name() == "int" || type->name() == "char")) out += "\tli \t$a0, "+ std::to_string(exp->getValue()) + "\n";
         if (type->name() == "int") { 
             out += "\tli \t$v0, 1\n";
@@ -829,7 +823,9 @@ int WriteStmt(int argList){
             out += "\tmove \t$a0, $t" + std::to_string(r) + " # write boolean\n";
             out += "\tsyscall\n";
         }
-        else {} // non-printable type
+        else {
+            std::cout << "ERROR: cannot print type " + type->name() + ".\n";
+        } // non-printable type
         //fe->addCode(out);
     }
     fe->statements.emplace_back(out);
@@ -859,55 +855,59 @@ int ProcCall(char* id, int argList){
         return EXIT_FAILURE;
     }
     auto psym = std::dynamic_pointer_cast<ParameterSymbol>(params);
-    auto fd = psym->params;
-    // std::cout << fd->params.size() << std::endl;
-    auto ps = fd->params;
+    auto fd = psym->params; 
+    auto ps = fd->params;    
     auto args = fe->arguments.get(argList);
+    if (argList == -1) {
+        args = std::make_shared<std::vector<std::shared_ptr<Expression>>>();
+    }
     if (ps.size() != args->size()) {
         std::cout << "ERROR: function contains an improper number of arguments. Expected " + std::to_string(ps.size()) + " but got " + std::to_string(args->size()) << std::endl;
         return EXIT_FAILURE;
     }
     std::string out = "";
-    // check args match params
     out += "\tsw \t$ra, -4($sp)\n";
     out += "\tsw \t$fp, -8($sp)\n";
     out += "\taddi \t$sp, $sp, -8\n";
-    // load parameters
     for (int i = 0; i < args->size(); i++) {
-        if (args->at(i)->type->name() != ps[i]->type->name()){
-            std::cout << "ERROR: expected type " + ps[i]->type->name() + " but got " + args->at(i)->type->name();
+        auto t = args->at(i)->type;
+        auto pt = ps[i]->type;
+        while (t->name() == "reference"){
+            t = std::dynamic_pointer_cast<ReferenceType>(t)->type;
+        }
+        while (pt->name() == "reference"){
+            pt = std::dynamic_pointer_cast<ReferenceType>(pt)->type;
+        }
+        while(t->name() == "array" && pt->name() != "array"){
+            t = std::dynamic_pointer_cast<ArrayType>(t)->type;
+        }
+        if (t->name() != pt->name()){
+            std::cout << "ERROR: expected type " + pt->name() + " but got " + t->name();
             return EXIT_FAILURE;
         }
-        out += args->at(i)->emit();
-        argsoff += args->at(i)->type->size();
-        out += "\tsw \t$t" + std::to_string(args->at(i)->r) + ", -" + std::to_string(argsoff) + "($sp)\n";
+        if (ps[i]->type->name() == "reference"){
+            if(args->at(i)->exp == ExpressionType::LVAL){
+                auto r = RegAlloc::instance()->getRegister();
+                out += args->at(i)->optCode(r);
+                argsoff += ps[i]->type->size();
+                out += "\tsw \t$t" + std::to_string(r) + ", -" + std::to_string(argsoff) + "($sp)\n";
+                RegAlloc::instance()->release(r);
+            }
+        }
+        else{
+            out += args->at(i)->emit();
+            argsoff += args->at(i)->type->size();
+            out += "\tsw \t$t" + std::to_string(args->at(i)->r) + ", -" + std::to_string(argsoff) + "($sp)\n";
+        }
     }
-
-    // some sort of addi $sp, sp, 0...
-
-    // store fp and ra, advance sp -8
-
-    // copy args to stack pointer
-//     for (int i = 0; i < args->size(); i++) {
-
-// // TODO: HERE!!!! parameters were added to symbol table, but it has since been popped, need a new system
-//         auto offset = st->findSymbol(ps[i]->name)->getMemLoc();
-        
-//     }
-    // fp = sp, sp = args offset
     out += "\tmove \t$fp, $sp\n";
     out += "\taddi \t$sp, $sp, -" + std::to_string(argsoff) + "\n";
-    // jal
     out += "\tjal BLOCK" + std::to_string(params->m_value) + "\n";
-    // sp <- args offset
     out += "\taddi \t$sp, $sp, " + std::to_string(argsoff) + "\n";
-    // sp <- -8
     out += "\taddi \t$sp, $sp, 8\n";
-    // grab old fp and ra
     out += "\tlw \t$ra, -4($sp)\n";
     out += "\tlw \t$fp, -8($sp)\n";
-    // difference here between Procedure and Function
-    // weird stuff with addi sp, sp, 0
+
     fe->statements.emplace_back(out);
     return fe->statements.size()-1;
 }
@@ -1030,13 +1030,11 @@ int stackRecords(int list, int rec) {
 int addParameter(int id, int type, int ref){
     auto fe = FrontEnd::instance();
     auto t = fe->types.get(type);
+    if (ref) t = std::make_shared<ReferenceType>(t);
     auto il = fe->identList.get(id);
     auto v = std::make_shared<std::vector<int>>();
     auto st = fe->getSymbolTable();
     for(int i = 0; i < il->size(); i++) {
-        // if (t->name() == "string") {
-        //      //should these take strings? "It should do what his does"
-        // }
         st->addParam(il->at(i), std::make_shared<VarSymbol>(t, "$fp", st->getParamOffset() ));
         int z = fe->parameter.add(std::make_shared<Parameter>(il->at(i), t, static_cast<bool>(ref)));
         v->emplace_back(z);
@@ -1059,12 +1057,12 @@ int stackParameters(int list, int p) {
 }
 
 void addProcedure(char* id, int params, int body) {
-
     auto fe = FrontEnd::instance();
-    auto p = std::shared_ptr<std::vector<int>>();
-    auto fd = std::shared_ptr<FormalDecl>();
-    auto label = _block++;
+    if(body == -1) { fe->pop_ST(); }
+    auto p = std::make_shared<std::vector<int>>();
+    auto fd = std::make_shared<FormalDecl>();
     auto proc = fe->getSymbolTable()->findSymbol(id);
+    int label;
     if (fe->getSymbolTable()->findSymbol(id) != nullptr) {
         // if symbol already exists -> should exist, otherwise problem
         if (proc->getSub() != "Parameter") {
@@ -1080,12 +1078,13 @@ void addProcedure(char* id, int params, int body) {
                 }
                 fd = std::make_shared<FormalDecl>(fp);
             }
+
             if (body == -1) { // forward
-                if (!std::dynamic_pointer_cast<ParameterSymbol>(proc)->forward) {
-                    std::cout << "ERROR: " + std::string(id) + " has already been declared." << std::endl;
-                    EXIT_FAILURE;
+                if (std::dynamic_pointer_cast<ParameterSymbol>(proc)->forward) {
+                    std::cout << "ERROR: " + std::string(id) + " forward has already been declared." << std::endl;
                 }
-            
+                label = _block++;
+
                 auto sym = std::make_shared<ParameterSymbol>(fd, label);
                 sym->forward = true;
                 if (std::dynamic_pointer_cast<ParameterSymbol>(proc)->function!=false) {
@@ -1094,9 +1093,13 @@ void addProcedure(char* id, int params, int body) {
                 }
                 fe->getSymbolTable()->modSymbol(id, sym);
             }
-            
             else {
-                proc->m_value = label;
+                if (!std::dynamic_pointer_cast<ParameterSymbol>(proc)->labeled) {
+                    label = _block++;
+                }
+                else {
+                    label = proc->m_value;
+                }
                 std::dynamic_pointer_cast<ParameterSymbol>(proc)->forward = false;
 
                 fe->getSymbolTable()->modSymbol(id, std::make_shared<ParameterSymbol>(fd, label));
@@ -1138,16 +1141,16 @@ char* linkFunction (char* id) {
 
 void addFunction(char* id, int params,  int type, int body){
     auto fe = FrontEnd::instance();
-    auto p = std::shared_ptr<std::vector<int>>();
-    auto fd = std::shared_ptr<FormalDecl>();
-    auto label = _block++;
+    if(body == -1) { fe->pop_ST(); }
+    auto p = std::make_shared<std::vector<int>>();
+    auto fd = std::make_shared<FormalDecl>();
+    int label;
     auto func = fe->getSymbolTable()->findSymbol(id);
     auto t = fe->types.get(type);
     if (fe->getSymbolTable()->findSymbol(id) != nullptr) {
         // if symbol already exists -> should exist, otherwise problem
         if (func->getSub() != "Parameter") {
             std::cout << "ERROR: " + std::string(id) + " is symbol other than type Function." << std::endl;
-            EXIT_FAILURE;
         }
         else {
             if (params != -1) {
@@ -1159,22 +1162,27 @@ void addFunction(char* id, int params,  int type, int body){
                 fd = std::make_shared<FormalDecl>(fp);
             }
             if (body == -1) { // forward
-                if (!std::dynamic_pointer_cast<ParameterSymbol>(func)->forward ) {
-                    std::cout << "ERROR: " + std::string(id) + " has already been declared." << std::endl;
-                    EXIT_FAILURE;
+                if (std::dynamic_pointer_cast<ParameterSymbol>(func)->forward ) {
+                    std::cout << "ERROR: " + std::string(id) + " forward has already been declared." << std::endl;
                 }
+                label = _block++;
             
                 auto sym = std::make_shared<ParameterSymbol>(t, fd, label);
                 sym->forward = true;
                 if (std::dynamic_pointer_cast<ParameterSymbol>(func)->function!=true) {
                     std::cout << "ERROR: " + std::string(id) +  " is a function and  has been previously declared as a parameter.";
-                    EXIT_FAILURE;
                 }
                 fe->getSymbolTable()->modSymbol(id, sym);
             }
             
             else {
-                func->m_value = label;
+                if (!std::dynamic_pointer_cast<ParameterSymbol>(func)->labeled) {
+                    label = _block++;
+                }
+                else {
+                    label = func->m_value;
+                }
+
                 std::dynamic_pointer_cast<ParameterSymbol>(func)->forward = false;
 
                 fe->getSymbolTable()->modSymbol(id, std::make_shared<ParameterSymbol>(t, fd, label));

@@ -63,17 +63,22 @@ public:
 		params = p;
 		m_value = block;
 		function = true;
+		labeled = true;
 	}
 	ParameterSymbol(std::shared_ptr<FormalDecl> p, int block) {
 		params = p;
 		m_value = block;
 		function = false;
+		labeled = true;
 	}
-	ParameterSymbol(bool f) : forward(f) {}
+	ParameterSymbol(bool f) : function(f) {	
+		m_value = -1;
+	}
 	bool forward = 0;
 	std::shared_ptr<FormalDecl> params;
 	std::string getSub() { return "Parameter"; }
 	bool function;
+	bool labeled = false;
 };
 
 #endif
