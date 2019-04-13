@@ -341,9 +341,7 @@ LValue: IDENT_SYMBOL				{ $$ = LValID($1);}
 
 %%
 
-int main(int, char**) {
-	yyparse();
-}
+
 
 void yyerror(const char* msg)
 {

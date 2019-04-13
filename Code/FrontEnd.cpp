@@ -17,6 +17,10 @@
 #include "Type.hpp"
 #include "FormalDecl.hpp"
 
+
+std::string fcode = "";
+
+
 template <typename T>
 class NodeList
 {
@@ -77,6 +81,15 @@ public:
         return code;
     }
 
+    std::string getFinalCode() {
+        return finalCode;
+    }
+
+    void setfinalCode(std::string v){
+        finalCode = v;
+        fcode = v;
+    }
+
     
     //some list of expressions
     NodeList<Expression> expressions;
@@ -100,13 +113,14 @@ private:
     std::shared_ptr<SymbolTable> symbolTable = std::make_shared<SymbolTable>(nullptr, "$gp");
     std::shared_ptr<StringTable> stringTable;
     std::string code = "";
+    std::string finalCode = "";
 };
 
 std::shared_ptr<RegAlloc> RegAlloc::r;
-auto reg = RegAlloc::instance();
 std::shared_ptr<FrontEnd> FrontEnd::fe;
-int _label = 0;
-int _block = 0;
+static auto reg = RegAlloc::instance();
+static int _label = 0;
+static int _block = 0;
 
 std::string printStringTable(){
     auto st = StringTable::instance()->getTable();
@@ -145,7 +159,7 @@ void emitMIPS(int ss) {
     out += "GA:\n";
 
 
-    std::cout << out << std::endl;
+    FrontEnd::instance()->setfinalCode(out);
 }
 
 void push_ST() {

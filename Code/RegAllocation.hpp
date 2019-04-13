@@ -5,6 +5,7 @@
 
 class RegAlloc {
 public:
+
     bool reg [NUM_REG];
 
     static std::shared_ptr<RegAlloc> r;
