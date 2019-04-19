@@ -7,6 +7,7 @@
 #include <memory>
 #include <iostream>
 #include <string>
+#include <functional>
 
 enum ExpressionType {
     OR,
